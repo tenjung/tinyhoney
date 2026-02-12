@@ -1,0 +1,72 @@
+<div class="container mx-auto px-4 py-12 max-w-2xl">
+  <div class="bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden">
+    <div class="p-8 md:p-12 border-b border-slate-100">
+      <h1 class="text-3xl font-black text-slate-900 mb-2">마이페이지</h1>
+      <p class="text-slate-500 font-medium">나만의 핫딜 알림 조건을 설정하세요.</p>
+    </div>
+
+    <%= form_with model: @user, url: profile_path, method: :patch, class: "p-8 md:p-12 space-y-10" do |f| %>
+      <% if @user.errors.any? %>
+        <div class="p-4 bg-red-50 text-red-700 rounded-2xl text-sm font-bold">
+          <%= @user.errors.full_messages.first %>
+        </div>
+      <% end %>
+
+      <!-- 이메일 정보 (읽기 전용) -->
+      <div class="space-y-2">
+        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">연결된 계정</label>
+        <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <span class="font-bold text-slate-700"><%= @user.email %></span>
+          <% if @user.provider.present? %>
+            <span class="ml-auto px-2 py-1 bg-slate-200 text-slate-600 text-[10px] font-black rounded-lg uppercase"><%= @user.provider %></span>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 알림 활성화 토글 -->
+      <div class="flex items-center justify-between p-6 bg-yellow-50 rounded-3xl border border-yellow-100">
+        <div>
+          <h3 class="font-black text-slate-900">실시간 알림 서비스</h3>
+          <p class="text-sm text-yellow-700/60 font-medium mt-1">키워드 매칭 시 앱/푸시 알람을 보냅니다.</p>
+        </div>
+        <div class="relative inline-block w-12 h-6 transition duration-200 ease-in-out rounded-full bg-slate-200">
+          <%= f.check_box :alert_enabled, class: "absolute w-6 h-6 transition duration-200 ease-in-out transform bg-white border-2 rounded-full appearance-none cursor-pointer checked:translate-x-6 checked:bg-yellow-400 border-slate-200 checked:border-yellow-400" %>
+        </div>
+      </div>
+
+      <!-- 키워드 설정 -->
+      <div class="space-y-4">
+        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">관심 키워드</label>
+        <p class="text-sm text-slate-500 font-medium">쉼표(,)로 구분하여 여러 개를 입력할 수 있습니다.</p>
+        
+        <%= text_field_tag :keyword_list, @user.keywords.join(", "), 
+            class: "w-full p-4 bg-white rounded-2xl border-2 border-slate-100 focus:border-yellow-400 focus:bg-yellow-50/50 transition-all outline-none font-bold placeholder:text-slate-300", 
+            placeholder: "맥북, 아이패드, 나이키, 캠핑..." %>
+        
+        <div class="flex flex-wrap gap-2 pt-2">
+          <% @user.keywords.each do |keyword| %>
+            <span class="px-3 py-1.5 bg-slate-900 text-white text-[12px] font-bold rounded-full flex items-center gap-2 group hover:bg-red-500 transition-colors">
+              <%= keyword %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 opacity-50 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="pt-6">
+        <%= f.submit "설정 저장하기", class: "w-full py-5 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black rounded-3xl transition-all shadow-xl shadow-yellow-400/20 active:scale-95" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-8 text-center">
+    <%= link_to "계정 탈퇴하기", "#", class: "text-xs font-bold text-slate-300 hover:text-red-400 transition-colors" %>
+  </div>
+</div>

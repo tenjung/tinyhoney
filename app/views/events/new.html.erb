@@ -1,0 +1,53 @@
+<div class="container mx-auto px-4 py-12 max-w-3xl">
+  <div class="bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden">
+    <div class="p-8 md:p-12 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-black text-slate-900 mb-2">이벤트 등록</h1>
+        <p class="text-slate-500 font-medium">유용한 이벤트 정보를 커뮤니티와 공유하세요.</p>
+      </div>
+      <%= link_to events_path, class: "p-4 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-3xl transition-colors" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      <% end %>
+    </div>
+
+    <%= form_with model: @event, class: "p-8 md:p-12 space-y-8" do |f| %>
+      <% if @event.errors.any? %>
+        <div class="p-4 bg-red-50 text-red-700 rounded-2xl text-sm font-bold">
+          <%= @event.errors.full_messages.first %>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-2">
+          <%= f.label :platform_type, "분류", class: "block text-xs font-black text-slate-400 uppercase tracking-widest" %>
+          <%= f.select :platform_type, [["웹 전용", "web"], ["앱 전용", "app"]], {}, class: "w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-yellow-400 focus:bg-white transition-all outline-none font-bold accent-yellow-400" %>
+        </div>
+        <div class="space-y-2">
+          <%= f.label :thumbnail_url, "썸네일 이미지 URL (선택)", class: "block text-xs font-black text-slate-400 uppercase tracking-widest" %>
+          <%= f.text_field :thumbnail_url, class: "w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-yellow-400 focus:bg-white transition-all outline-none font-bold placeholder:text-slate-300", placeholder: "https://..." %>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :title, "이벤트 제목", class: "block text-xs font-black text-slate-400 uppercase tracking-widest" %>
+        <%= f.text_field :title, class: "w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-yellow-400 focus:bg-white transition-all outline-none font-bold placeholder:text-slate-300", placeholder: "제목을 입력하세요" %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :url, "링크 (URL)", class: "block text-xs font-black text-slate-400 uppercase tracking-widest" %>
+        <%= f.text_field :url, class: "w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-yellow-400 focus:bg-white transition-all outline-none font-bold placeholder:text-slate-300", placeholder: "https://..." %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :description, "상세 내용 (선택)", class: "block text-xs font-black text-slate-400 uppercase tracking-widest" %>
+        <%= f.text_area :description, rows: 4, class: "w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-yellow-400 focus:bg-white transition-all outline-none font-bold placeholder:text-slate-300", placeholder: "이벤트에 대한 간단한 설명을 입력하세요" %>
+      </div>
+
+      <div class="pt-6">
+        <%= f.submit "이벤트 게시하기", class: "w-full py-5 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black rounded-3xl transition-all shadow-xl shadow-yellow-400/20 active:scale-95" %>
+      </div>
+    <% end %>
+  </div>
+</div>

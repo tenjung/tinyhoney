@@ -1,0 +1,56 @@
+<div class="container mx-auto px-4 py-12">
+  <div class="mb-12 flex items-center justify-between">
+    <div>
+      <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">관리자 대시보드</h1>
+      <p class="text-slate-500 font-medium">플랫폼 현황을 한눈에 파악하세요.</p>
+    </div>
+    <div class="flex gap-4">
+      <%= link_to "Deal 관리", admin_deals_path, class: "px-6 py-3 bg-white border border-slate-200 text-slate-900 font-bold rounded-2xl hover:border-slate-900 transition-all shadow-sm" %>
+      <%= link_to "유저 관리", admin_users_path, class: "px-6 py-3 bg-white border border-slate-200 text-slate-900 font-bold rounded-2xl hover:border-slate-900 transition-all shadow-sm" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+    <div class="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
+      <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">총 핫딜 수</p>
+      <p class="text-4xl font-black text-slate-900"><%= Deal.count %></p>
+    </div>
+    <div class="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
+      <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">오늘 수집된 딜</p>
+      <p class="text-4xl font-black text-slate-900 text-yellow-500"><%= Deal.where('created_at > ?', Time.current.beginning_of_day).count %></p>
+    </div>
+    <div class="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
+      <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">총 회원 수</p>
+      <p class="text-4xl font-black text-slate-900"><%= User.count %></p>
+    </div>
+    <div class="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
+      <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">진행 중 이벤트</p>
+      <p class="text-4xl font-black text-slate-900 text-yellow-500"><%= Event.count %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white rounded-[40px] p-10 border border-slate-100 shadow-sm">
+      <h3 class="text-xl font-black text-slate-900 mb-8">사이트별 수집 분포</h3>
+      <div class="space-y-6">
+        <% Deal.group(:source).count.each do |source, count| %>
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-slate-600"><%= source %></span>
+            <div class="flex-grow mx-4 h-2 bg-slate-50 rounded-full overflow-hidden">
+              <div class="h-full bg-yellow-400 rounded-full" style="width: <%= (count.to_f / Deal.count * 100).round %>%"></div>
+            </div>
+            <span class="text-sm font-black text-slate-900"><%= count %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <div class="bg-white rounded-[40px] p-10 border border-slate-100 shadow-sm">
+      <h3 class="text-xl font-black text-slate-900 mb-8">최근 등록된 알림 키워드</h3>
+      <div class="flex flex-wrap gap-2">
+        <% User.pluck(:keywords).flatten.uniq.take(20).each do |keyword| %>
+          <span class="px-4 py-2 bg-slate-50 text-slate-600 text-xs font-bold rounded-full border border-slate-100"><%= keyword %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

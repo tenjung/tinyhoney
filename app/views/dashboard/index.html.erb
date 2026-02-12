@@ -1,0 +1,108 @@
+<!-- Hero Section -->
+<div class="bg-slate-900 overflow-hidden py-16 mb-12 relative">
+  <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-transparent pointer-events-none"></div>
+  <div class="container mx-auto px-4 relative z-10 text-center">
+    <div class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full mb-6 uppercase tracking-wider">
+      <span class="flex h-2 w-2 rounded-full bg-yellow-900 animate-pulse"></span>
+      실시간 핫딜 분석 중
+    </div>
+    <h1 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">
+      티끌 모아 <span class="text-yellow-400 underline decoration-yellow-400/40 underline-offset-8">부자</span>되는 <br class="md:hidden"> 가장 확실한 방법
+    </h1>
+    <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+      전국 20개 커뮤니티의 핫딜을 1초 단위로 분석하여 <br class="hidden md:block">
+      당신에게 꼭 필요한 상품을 역대 최저가에 매칭해 드립니다.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <div class="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+        <p class="text-slate-500 text-xs font-bold uppercase mb-1">오늘 발견한 핫딜</p>
+        <p class="text-2xl font-black text-white"><%= @recent_deals.count %>건</p>
+      </div>
+      <div class="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+        <p class="text-slate-500 text-xs font-bold uppercase mb-1">평균 절약 금액</p>
+        <p class="text-2xl font-black text-yellow-400">12,400원</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 pb-20">
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+    <div>
+      <h2 class="text-3xl font-black text-slate-900 tracking-tight">실시간 핫딜 피드</h2>
+      <p class="text-slate-500 font-medium">뽐뿌 등 주요 커뮤니티에서 방금 올라온 따끈한 핫딜입니다.</p>
+    </div>
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+      <%= link_to "전체", root_path, class: "px-5 py-2.5 #{params[:source].blank? ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200'} text-sm font-bold rounded-full whitespace-nowrap hover:border-yellow-400 transition-colors" %>
+      <% ["PPOMPPU", "RULIWEB", "QUASARZONE", "AMISAE", "CLIEN", "ARCALIVE"].each do |source| %>
+        <%= link_to source.capitalize, root_path(source: source.downcase), 
+            class: "px-5 py-2.5 #{params[:source] == source.downcase ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200'} text-sm font-bold rounded-full whitespace-nowrap hover:border-yellow-400 transition-colors" %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @recent_deals.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <% @recent_deals.each do |deal| %>
+        <div class="group relative bg-white rounded-3xl p-1 shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 hover:-translate-y-2">
+          <% if deal.is_lowest %>
+            <div class="absolute -top-3 -right-3 z-10">
+              <div class="bg-red-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg animate-bounce uppercase tracking-tighter">Lowest Price</div>
+            </div>
+          <% end %>
+
+          <div class="relative overflow-hidden rounded-[22px] bg-slate-50 aspect-video flex items-center justify-center group-hover:bg-yellow-50 transition-colors">
+            <% if deal.thumbnail_url.present? %>
+              <%= image_tag deal.thumbnail_url, class: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-500", alt: deal.title %>
+            <% else %>
+              <span class="text-6xl group-hover:scale-125 transition-transform duration-500">🛍️</span>
+            <% end %>
+          </div>
+
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600 border border-slate-200">
+                P
+              </div>
+              <span class="text-sm font-bold text-slate-500 uppercase tracking-wide"><%= deal.source %></span>
+              <span class="h-1 w-1 bg-slate-300 rounded-full"></span>
+              <span class="text-sm font-medium text-slate-400"><%= time_ago_in_words(deal.posted_at) %> 전</span>
+            </div>
+
+            <h3 class="text-lg font-black text-slate-900 leading-tight mb-4 group-hover:text-yellow-600 transition-colors line-clamp-2 min-h-[3rem]">
+              <%= link_to deal.title, deal_path(deal) %>
+            </h3>
+
+            <div class="flex items-center justify-between mt-auto">
+              <div>
+                <% if deal.price_histories.any? %>
+                  <p class="text-xs font-bold text-slate-400 line-through mb-0.5">
+                    <%= number_to_currency(deal.price_histories.average(:recorded_price), unit: "원", precision: 0, format: "%n%u") %>
+                  </p>
+                <% end %>
+                <p class="text-2xl font-black text-red-600 tracking-tighter">
+                  <%= number_to_currency(deal.price, unit: "원", precision: 0, format: "%n%u") %>
+                </p>
+              </div>
+              
+              <div class="flex items-center gap-2">
+                <%= link_to deal.affiliate_url, target: "_blank", class: "w-11 h-11 bg-slate-50 hover:bg-yellow-400 rounded-2xl flex items-center justify-center text-slate-400 hover:text-white transition-all shadow-sm border border-slate-100 hover:border-yellow-400" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-[40px] p-20 text-center border-2 border-dashed border-slate-200">
+      <div class="text-8xl mb-8">🫙</div>
+      <h3 class="text-2xl font-black text-slate-900 mb-4">현재 수집된 핫딜이 없습니다.</h3>
+      <p class="text-slate-500 mb-8 max-w-sm mx-auto">크롤러가 열심히 일하고 있습니다. 잠시만 기다려 주시거나 아래 버튼을 눌러 수동으로 수집을 시작해 보세요.</p>
+      <%= link_to "수동 동기화 실행", "#", class: "px-8 py-4 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black rounded-3xl transition-all shadow-lg shadow-yellow-400/20 active:scale-95 inline-block" %>
+    </div>
+  <% end %>
+</div>

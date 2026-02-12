@@ -1,0 +1,24 @@
+<div class="container mx-auto px-4 py-12">
+  <div class="mb-12">
+    <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">커뮤니티</h1>
+    <p class="text-slate-500 font-medium">다양한 주제로 소통하고 정보를 나누는 공간입니다.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <% @boards.each do |board| %>
+      <%= link_to board_path(board.slug), class: "group bg-white rounded-[40px] p-8 md:p-10 border border-slate-100 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2" do %>
+        <div class="w-16 h-16 bg-yellow-100 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-yellow-400 transition-colors">
+          <span class="text-3xl text-yellow-700 group-hover:text-yellow-900 transition-colors">💬</span>
+        </div>
+        <h3 class="text-2xl font-black text-slate-900 mb-4 tracking-tight"><%= board.name %></h3>
+        <p class="text-slate-500 font-medium mb-8"><%= board.description %></p>
+        <div class="flex items-center text-sm font-black text-slate-900 gap-2">
+          게시판 입장하기
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

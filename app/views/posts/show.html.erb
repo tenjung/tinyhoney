@@ -1,0 +1,64 @@
+<div class="container mx-auto px-4 py-12 max-w-4xl">
+  <div class="mb-12 flex items-center justify-between">
+    <%= link_to board_path(@board.slug), class: "group flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      목록으로 돌아가기
+    <% end %>
+  </div>
+
+  <article class="bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden mb-8">
+    <div class="p-8 md:p-12 border-b border-slate-100">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-black">
+          <%= @post.user.name.to_s[0] || "U" %>
+        </div>
+        <div>
+          <p class="text-sm font-black text-slate-900"><%= @post.user.name.presence || "G" %></p>
+          <p class="text-xs font-bold text-slate-400">작성일: <%= @post.created_at.strftime("%Y.%m.%d %H:%M") %></p>
+        </div>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight"><%= @post.title %></h1>
+    </div>
+    <div class="p-8 md:p-12 prose prose-slate max-w-none text-slate-700 font-medium leading-relaxed">
+      <%= simple_format @post.content %>
+    </div>
+  </article>
+
+  <!-- 댓글 섹션 -->
+  <section class="space-y-6">
+    <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-8">
+      댓글 <span class="bg-slate-200 text-slate-500 text-xs px-2 py-0.5 rounded-full"><%= @comments.count %></span>
+    </h2>
+
+    <div class="space-y-4">
+      <% @comments.each do |comment| %>
+        <div class="bg-white rounded-3xl p-6 border border-slate-100">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-sm font-black text-slate-900"><%= comment.user.name.presence || "G" %></span>
+            <span class="h-1 w-1 bg-slate-200 rounded-full"></span>
+            <span class="text-xs font-bold text-slate-400"><%= time_ago_in_words(comment.created_at) %> 전</span>
+          </div>
+          <p class="text-slate-600 font-medium leading-relaxed"><%= comment.content %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <% if user_signed_in? %>
+      <div class="mt-8 bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+        <%= form_with model: [@board, @post, @comment], url: board_post_comments_path(@board.slug, @post), class: "space-y-4" do |f| %>
+          <%= f.text_area :content, rows: 3, placeholder: "깨끗한 커뮤니티를 위해 정중한 댓글 부탁드립니다.", class: "w-full p-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-yellow-400 focus:bg-white transition-all outline-none font-medium placeholder:text-slate-300" %>
+          <div class="flex justify-end">
+            <%= f.submit "댓글 작성", class: "px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black rounded-2xl transition-all shadow-lg shadow-yellow-400/20 active:scale-95" %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="mt-8 p-8 bg-slate-100 rounded-3xl text-center">
+        <p class="text-sm font-bold text-slate-500 mb-4">로그인 후 댓글을 작성할 수 있습니다.</p>
+        <%= link_to "로그인하러 가기", new_user_session_path, class: "text-slate-900 font-black border-b-2 border-yellow-400 hover:text-yellow-600 transition-colors" %>
+      </div>
+    <% end %>
+  </section>
+</div>
