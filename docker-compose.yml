@@ -8,16 +8,6 @@ services:
 
   web:
     build: .
-    command: >
-      bash -c "
-        rm -f tmp/pids/server.pid &&
-        bundle install &&
-        yarn install &&
-        yarn build:css &&
-        bundle exec rails db:prepare &&
-        bundle exec rails s -p 3000 -b '0.0.0.0'
-      "
-
     volumes:
       - .:/rails
     ports:
@@ -25,6 +15,12 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/tiny_honey_development
-      RAILS_ENV: development
-
+      RAILS_MASTER_KEY: ddfce4d1f12f66f9ce8c1499777e169b
+      DATABASE_URL: postgres://postgres:password@db:5432/tiny_honey_production
+      RAILS_ENV: production
+      RAILS_SERVE_STATIC_FILES: true
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/up" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
