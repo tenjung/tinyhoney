@@ -1,4 +1,4 @@
-class UsersController < ApplicationRecord
+class UsersController < ApplicationController
   before_action :authenticate_user!
 
   def show
@@ -7,7 +7,7 @@ class UsersController < ApplicationRecord
 
   def update
     @user = current_user
-    
+
     # Parse comma-separated keywords from text field
     if params[:keyword_list].present?
       @user.keywords = params[:keyword_list].split(",").map(&:strip).reject(&:blank?)

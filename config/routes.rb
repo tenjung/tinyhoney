@@ -5,6 +5,16 @@ Rails.application.routes.draw do
   # Devise & Social Login
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
 
+  # Admin Dashboard
+  namespace :admin do
+    get "/", to: "dashboard#index", as: :dashboard
+    resources :deals
+    resources :events
+    resources :users
+    resources :boards
+    resources :posts
+  end
+
   # Core Features
   resources :deals, only: [ :index, :show ]
   resources :events, only: [ :index, :show, :new, :create ]
@@ -20,11 +30,7 @@ Rails.application.routes.draw do
   resource :profile, only: [ :show, :update ], controller: "users"
 
   # Admin Dashboard
-  namespace :admin do
-    root "dashboard#index"
-    resources :deals, only: [ :index, :destroy ]
-    resources :users, only: [ :index, :update ]
-  end
+
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check

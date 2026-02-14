@@ -1,0 +1,83 @@
+<% content_for :title, @event.new_record? ? "이벤트 등록" : "이벤트 수정" %>
+
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-3xl mx-auto">
+  <%= form_with(model: [:admin, @event], local: true, class: "space-y-6") do |f| %>
+    <% if @event.errors.any? %>
+      <div class="bg-rose-50 p-4 rounded-md border border-rose-200">
+        <h3 class="text-sm font-medium text-rose-800"><%= pluralize(@event.errors.count, "error") %> prohibited this event from being saved:</h3>
+        <ul class="mt-2 list-disc pl-5 text-sm text-rose-700">
+          <% @event.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="col-span-2">
+        <%= f.label :title, "이벤트명", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.text_field :title, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div class="col-span-2">
+        <%= f.label :url, "이벤트 URL", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.text_field :url, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :organizer, "주최사", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.text_field :organizer, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :platform_type, "플랫폼/카테고리", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.select :platform_type, ["통신사", "가전", "식품", "생활용품", "의류", "뷰티", "스포츠", "게임", "가구", "반려동물", "디지털", "금융", "기타"], { prompt: "선택하세요" }, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :entry_type, "응모 형태", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.select :entry_type, ["작문/댓글", "선착순", "구매", "가입", "자동참여", "퀴즈", "설문", "기타"], { prompt: "선택하세요" }, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :winner_count, "당첨 인원", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.number_field :winner_count, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :start_date, "시작일", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.date_field :start_date, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :end_date, "종료일", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.date_field :end_date, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+      
+      <div>
+        <%= f.label :announcement_date, "당첨 발표일", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.date_field :announcement_date, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div class="col-span-2">
+        <%= f.label :prize_tags, "경품 태그 (쉼표로 구분)", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.text_field :prize_tags, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div class="col-span-2">
+        <%= f.label :thumbnail_url, "썸네일 URL", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.text_field :thumbnail_url, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+
+      <div class="col-span-2">
+        <%= f.label :description, "상세 설명", class: "block text-sm font-medium text-slate-700" %>
+        <%= f.text_area :description, rows: 4, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm" %>
+      </div>
+    </div>
+
+    <div class="flex justify-end pt-5">
+      <%= link_to "취소", admin_events_path, class: "bg-white py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 mr-3" %>
+      <%= f.submit @event.new_record? ? "등록하기" : "수정하기", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500" %>
+    </div>
+  <% end %>
+</div>

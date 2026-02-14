@@ -1,4 +1,4 @@
-<%# ── Community / 커뮤니티 메인 ── %>
+<%# ── Community / 커뮤니티 대시보드 ── %>
 
 <div class="dash-wrap">
 
@@ -13,9 +13,9 @@
         { label: '활성 회원', value: User.count, color: 'var(--color-emerald-600)' }
       ] %>
 
-  <%# ━━ 게시판 그리드 ━━ %>
+  <%# ━━ 게시판 탭 Pills ━━ %>
   <% if @boards.any? %>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+    <section class="pill-row">
       <% 
         board_icons = {
           "exchange" => "🤝",
@@ -26,78 +26,134 @@
         }
       %>
       <% @boards.each do |board| %>
-        <%= link_to board_path(board.slug), class: "card", style: "text-decoration: none; color: inherit; padding: 2rem; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 1rem;" do %>
-          <%# 아이콘 %>
-          <div style="width: 4rem; height: 4rem; background: linear-gradient(135deg, var(--color-amber-100) 0%, var(--color-amber-200) 100%); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+        <%= link_to board_path(board.slug), class: "pill", style: "display: flex; align-items: center; gap: 0.5rem;" do %>
+          <span style="font-size: 1.25rem;"><%= board_icons[board.slug] || "💬" %></span>
+          <%= board.name %>
+          <span class="badge" style="font-size: 0.75rem; padding: 0.125rem 0.5rem; margin-left: 0.25rem;">
+            <%= board.posts.count %>
+          </span>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <%# ━━ 2단 레이아웃: 오늘의 BEST (좌) + 최근 게시글 (우) ━━ %>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    
+    <%# 왼쪽: 오늘의 BEST 글 %>
+    <section class="card-static" style="padding: 1.5rem;">
+      <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--color-slate-900); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--color-amber-500);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        오늘의 BEST
+      </h2>
+      
+      <% today_posts = Post.where("created_at >= ?", Date.today).order(created_at: :desc).limit(5) %>
+      <% if today_posts.any? %>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <% today_posts.each_with_index do |post, idx| %>
+            <%= link_to board_post_path(post.board, post), style: "display: flex; gap: 0.75rem; padding: 0.875rem; background: var(--color-slate-50); border-radius: 0.5rem; text-decoration: none; color: inherit; transition: all 0.2s; border: 1px solid var(--color-slate-100);" do %>
+              <%# 순위 %>
+              <div style="flex: 0 0 auto; width: 2rem; height: 2rem; background: linear-gradient(135deg, var(--color-amber-400) 0%, var(--color-amber-500) 100%); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 0.875rem;">
+                <%= idx + 1 %>
+              </div>
+              
+              <%# 내용 %>
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge" style="font-size: 0.75rem;"><%= post.board.name %></span>
+                  <span style="font-size: 0.875rem; font-weight: 700; color: var(--color-slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <%= post.title %>
+                  </span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8125rem; color: var(--color-slate-500);">
+                  <span><%= post.user&.email&.split('@')&.first || "익명" %></span>
+                  <span>·</span>
+                  <span><%= time_ago_in_words(post.created_at) %>전</span>
+                  <span style="display: flex; align-items: center; gap: 0.25rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <%= post.comments.count %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <div style="text-align: center; padding: 3rem 1rem; color: var(--color-slate-400);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+          <p style="font-size: 0.9375rem; font-weight: 600;">오늘 작성된 글이 없습니다</p>
+        </div>
+      <% end %>
+    </section>
+
+    <%# 오른쪽: 최근 게시글 %>
+    <section class="card-static" style="padding: 1.5rem;">
+      <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--color-slate-900); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--color-emerald-500);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        최근 게시글
+      </h2>
+      
+      <% if @recent_posts.any? %>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <% @recent_posts.each do |post| %>
+            <%= link_to board_post_path(post.board, post), style: "display: flex; gap: 0.75rem; padding: 0.875rem; background: var(--color-slate-50); border-radius: 0.5rem; text-decoration: none; color: inherit; transition: all 0.2s; border: 1px solid var(--color-slate-100);" do %>
+              <%# 아이콘 %>
+              <div style="flex: 0 0 auto; width: 2rem; height: 2rem; background: var(--color-slate-200); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                <%= board_icons[post.board.slug] || "💬" %>
+              </div>
+              
+              <%# 내용 %>
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="badge" style="font-size: 0.75rem;"><%= post.board.name %></span>
+                  <span style="font-size: 0.875rem; font-weight: 700; color: var(--color-slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <%= post.title %>
+                  </span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8125rem; color: var(--color-slate-500);">
+                  <span><%= post.user&.email&.split('@')&.first || "익명" %></span>
+                  <span>·</span>
+                  <span><%= time_ago_in_words(post.created_at) %>전</span>
+                  <span style="display: flex; align-items: center; gap: 0.25rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <%= post.comments.count %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <div style="text-align: center; padding: 3rem 1rem; color: var(--color-slate-400);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+          <p style="font-size: 0.9375rem; font-weight: 600;">아직 게시글이 없습니다</p>
+        </div>
+      <% end %>
+    </section>
+
+  </div>
+
+  <%# ━━ 게시판 빠른 링크 (컴팩트) ━━ %>
+  <section class="card-static" style="padding: 1.5rem;">
+    <h2 style="font-size: 1.125rem; font-weight: 800; color: var(--color-slate-900); margin-bottom: 1rem;">게시판 바로가기</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+      <% @boards.each do |board| %>
+        <%= link_to board_path(board.slug), class: "card", style: "text-decoration: none; color: inherit; padding: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s;" do %>
+          <div style="width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg, var(--color-amber-100) 0%, var(--color-amber-200) 100%); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
             <%= board_icons[board.slug] || "💬" %>
           </div>
-
-          <%# 제목 %>
-          <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--color-slate-900); margin: 0;">
-            <%= board.name %>
-          </h3>
-
-          <%# 설명 %>
-          <p style="font-size: 0.9375rem; color: var(--color-slate-600); line-height: 1.6; margin: 0; flex: 1;">
-            <%= board.description %>
-          </p>
-
-          <%# 통계 %>
-          <div style="display: flex; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-slate-100);">
-            <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--color-slate-500);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              <span style="font-weight: 600;"><%= board.posts.count %></span>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 0.9375rem; font-weight: 700; color: var(--color-slate-900); margin-bottom: 0.125rem;">
+              <%= board.name %>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--color-slate-500);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-              <span style="font-weight: 600;">활발</span>
+            <div style="font-size: 0.8125rem; color: var(--color-slate-500);">
+              <%= board.posts.count %>개의 글
             </div>
           </div>
-
-          <%# 입장 버튼 %>
-          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 700; color: var(--color-amber-600); margin-top: 0.5rem;">
-            게시판 입장하기
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--color-slate-400); flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         <% end %>
       <% end %>
     </div>
-  <% else %>
-    <%= render 'shared/empty_state',
-        icon: '📋',
-        title: '게시판이 없습니다',
-        message: '아직 생성된 게시판이 없습니다.' %>
-  <% end %>
-
-  <%# ━━ 최근 게시글 ━━ %>
-  <% if @recent_posts.any? %>
-    <section class="card-static" style="padding: 2rem; margin-top: 2rem;">
-      <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--color-slate-900); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--color-amber-500);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        최근 게시글
-      </h2>
-      <div style="display: flex; flex-direction: column; gap: 1rem;">
-        <% @recent_posts.each do |post| %>
-          <%= link_to board_post_path(post.board, post), style: "display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--color-slate-50); border-radius: 0.5rem; text-decoration: none; color: inherit; transition: all 0.2s;" do %>
-            <div style="flex: 1; min-width: 0;">
-              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                <span class="badge" style="font-size: 0.75rem;"><%= post.board.name %></span>
-                <span style="font-size: 0.875rem; font-weight: 700; color: var(--color-slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  <%= post.title %>
-                </span>
-              </div>
-              <div style="font-size: 0.8125rem; color: var(--color-slate-500);">
-                <%= post.user&.email || "익명" %> · <%= time_ago_in_words(post.created_at) %>전
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--color-slate-400);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-              <%= post.comments.count %>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-    </section>
-  <% end %>
+  </section>
 
 </div>

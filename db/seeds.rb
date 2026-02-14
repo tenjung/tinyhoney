@@ -1,382 +1,549 @@
 # frozen_string_literal: true
 
-# 🌱 TGMOA Seed Data — 다양한 카테고리의 현실적인 핫딜 더미 데이터
+# 🌱 TGMOA Seed Data — 다양한 카테고리의 현실적인 핫딜 & 커뮤니티 더미 데이터
 
 puts "🧹 기존 데이터 초기화..."
+Comment.destroy_all
+Post.destroy_all
+Board.destroy_all
 Event.destroy_all
 PriceHistory.destroy_all
 Deal.destroy_all
+User.destroy_all
 
 puts "🌱 핫딜 데이터 생성 중..."
-
-# ── 카테고리별 Unsplash 실제 이미지 URLs ──
-IMAGES = {
-  fashion: [
-    "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=400&h=400&fit=crop"
-  ],
-  food: [
-    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=400&h=400&fit=crop"
-  ],
-  digital: [
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1546868871-af0de0ae72be?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop"
-  ],
-  appliance: [
-    "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop"
-  ],
-  game: [
-    "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=400&fit=crop"
-  ],
-  living: [
-    "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop"
-  ],
-  beauty: [
-    "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400&h=400&fit=crop"
-  ],
-  sports: [
-    "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop"
-  ],
-  kids: [
-    "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&h=400&fit=crop"
-  ],
-  pet: [
-    "https://images.unsplash.com/photo-1583337130417-13104dec14a7?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=400&fit=crop"
-  ]
-}.freeze
-
-SOURCES = %w[PPOMPPU RULIWEB QUASARZONE AMISAE CLIEN ARCALIVE].freeze
-
 deals_data = [
-  # ── 의류 ──
-  { title: "세미오버핏 폴리 반집업 맨투맨 (4컬러)", category: "의류", shop_name: "컨셉원",
-    price: 22_000, shipping_fee: 0, source: "PPOMPPU", is_lowest: false, img_key: :fashion, img_idx: 0 },
-  { title: "나이키 에어맥스 97 OG 실버불릿 DM0028-002", category: "의류", shop_name: "나이키코리아",
-    price: 119_000, shipping_fee: 3_000, source: "ARCALIVE", is_lowest: false, img_key: :fashion, img_idx: 1 },
-  { title: "무탠다드 워시드 포플린 셔츠 1.8발 (화이트/블루)", category: "의류", shop_name: "무신사",
-    price: 15_900, shipping_fee: 0, source: "AMISAE", is_lowest: false, img_key: :fashion, img_idx: 2 },
-  { title: "[리바이스] 501 오리지널 스트레이트 데님 진 (빈티지워싱)", category: "의류", shop_name: "하프클럽",
-    price: 49_900, shipping_fee: 0, source: "CLIEN", is_lowest: true, img_key: :fashion, img_idx: 3 },
-  { title: "유니클로 히트텍 크루넥 T 긴팔 (남/여)", category: "의류", shop_name: "유니클로",
-    price: 9_900, shipping_fee: 0, source: "PPOMPPU", is_lowest: false, img_key: :fashion, img_idx: 4 },
-  { title: "아디다스 삼바 OG 클래식 스니커즈 (블랙/화이트)", category: "의류", shop_name: "아디다스",
-    price: 129_000, shipping_fee: 0, source: "RULIWEB", is_lowest: true, img_key: :fashion, img_idx: 5 },
-
-  # ── 식품 ──
-  { title: "앤업카페 돌체라떼 300ml 10개입 대용량팩", category: "식품", shop_name: "토스",
-    price: 12_000, shipping_fee: 0, source: "PPOMPPU", is_lowest: true, img_key: :food, img_idx: 0 },
-  { title: "곰곰 1+등급 한우 국거리 300g (냉장)", category: "식품", shop_name: "쿠팡",
-    price: 9_900, shipping_fee: 0, source: "PPOMPPU", is_lowest: false, img_key: :food, img_idx: 1 },
-  { title: "스타벅스 아메리카노 T 10잔 교환권", category: "식품", shop_name: "카카오톡선물하기",
-    price: 33_000, shipping_fee: 0, source: "PPOMPPU", is_lowest: false, img_key: :food, img_idx: 2 },
-  { title: "오뚜기 진라면 매운맛 120g × 40봉 박스", category: "식품", shop_name: "이마트몰",
-    price: 18_900, shipping_fee: 0, source: "QUASARZONE", is_lowest: true, img_key: :food, img_idx: 3 },
-  { title: "[코스트코] 커클랜드 시그니처 프로틴바 20개입", category: "식품", shop_name: "코스트코",
-    price: 24_800, shipping_fee: 0, source: "CLIEN", is_lowest: false, img_key: :food, img_idx: 4 },
-
-  # ── 디지털 ──
-  { title: "로지텍 G502 X PLUS 무선 게이밍 마우스", category: "디지털", shop_name: "쿠팡",
-    price: 89_000, shipping_fee: 0, source: "CLIEN", is_lowest: true, img_key: :digital, img_idx: 0 },
-  { title: "삼성 갤럭시 버즈3 프로 SM-R630 정품", category: "디지털", shop_name: "SSG닷컴",
-    price: 179_000, shipping_fee: 0, source: "RULIWEB", is_lowest: true, img_key: :digital, img_idx: 1 },
-  { title: "애플 에어팟 프로 2세대 USB-C MQD83KH/A", category: "디지털", shop_name: "Apple Store",
-    price: 259_000, shipping_fee: 0, source: "RULIWEB", is_lowest: false, img_key: :digital, img_idx: 2 },
-  { title: "소니 WH-1000XM5 무선 노이즈캔슬링 헤드폰 (블랙)", category: "디지털", shop_name: "11번가",
-    price: 289_000, shipping_fee: 0, source: "QUASARZONE", is_lowest: true, img_key: :digital, img_idx: 3 },
-  { title: "앱코 HACKER K660 ARC 프리미엄 기계식 키보드", category: "디지털", shop_name: "다나와",
-    price: 59_900, shipping_fee: 2_500, source: "QUASARZONE", is_lowest: false, img_key: :digital, img_idx: 4 },
-  { title: "아이폰 15 Pro Max 256GB 자급제 (내추럴 티타늄)", category: "디지털", shop_name: "쿠팡",
-    price: 1_550_000, shipping_fee: 0, source: "PPOMPPU", is_lowest: false, img_key: :digital, img_idx: 5 },
-
-  # ── 가전 ──
-  { title: "다이슨 V15 디텍트 앱솔루트 무선청소기", category: "가전", shop_name: "다이슨공식몰",
-    price: 699_000, shipping_fee: 0, source: "CLIEN", is_lowest: true, img_key: :appliance, img_idx: 0 },
-  { title: "LG 퓨리케어 360° 공기청정기 AS181DAW", category: "가전", shop_name: "LG전자",
-    price: 389_000, shipping_fee: 0, source: "PPOMPPU", is_lowest: false, img_key: :appliance, img_idx: 1 },
-  { title: "삼성 비스포크 냉장고 RF85B9111AP (870L)", category: "가전", shop_name: "삼성닷컴",
-    price: 2_190_000, shipping_fee: 0, source: "QUASARZONE", is_lowest: false, img_key: :appliance, img_idx: 2 },
-  { title: "발뮤다 더 토스터 K11A (화이트/블랙)", category: "가전", shop_name: "네이버쇼핑",
-    price: 259_000, shipping_fee: 0, source: "AMISAE", is_lowest: true, img_key: :appliance, img_idx: 3 },
-
-  # ── 게임 ──
-  { title: "[스팀] 스팀 설날 할인 역대 최저가 게임 모음", category: "게임", shop_name: "스팀",
-    price: 100, shipping_fee: 0, source: "QUASARZONE", is_lowest: true, img_key: :game, img_idx: 0 },
-  { title: "닌텐도 스위치 OLED 젤다 에디션 + 틸즈오브더킹덤", category: "게임", shop_name: "쿠팡",
-    price: 419_000, shipping_fee: 0, source: "RULIWEB", is_lowest: false, img_key: :game, img_idx: 1 },
-  { title: "PS5 슬림 디스크 에디션 + 듀얼센스 추가 번들", category: "게임", shop_name: "11번가",
-    price: 559_000, shipping_fee: 0, source: "ARCALIVE", is_lowest: false, img_key: :game, img_idx: 2 },
-
-  # ── 생활용품/가구 ──
-  { title: "이케아 KALLAX 칼락스 선반유닛 4×2 화이트", category: "가구", shop_name: "이케아",
-    price: 99_900, shipping_fee: 5_000, source: "AMISAE", is_lowest: false, img_key: :living, img_idx: 0 },
-  { title: "수저/젓가락/포크/나이프/디저트 등 풀세트", category: "생활용품", shop_name: "11번가",
-    price: 3_900, shipping_fee: 0, source: "PPOMPPU", is_lowest: false, img_key: :living, img_idx: 1 },
-  { title: "시디즈 T50 에어 메쉬 사무용 의자 (블랙)", category: "가구", shop_name: "시디즈 공식몰",
-    price: 349_000, shipping_fee: 0, source: "CLIEN", is_lowest: true, img_key: :living, img_idx: 2 },
-
-  # ── 뷰티 ──
-  { title: "에스티로더 갈색병 어드밴스드 나이트 리페어 50ml", category: "뷰티", shop_name: "올리브영",
-    price: 89_000, shipping_fee: 0, source: "AMISAE", is_lowest: false, img_key: :beauty, img_idx: 0 },
-  { title: "헤라 블랙쿠션 SPF34 리필 포함 세트", category: "뷰티", shop_name: "네이버쇼핑",
-    price: 35_000, shipping_fee: 0, source: "PPOMPPU", is_lowest: true, img_key: :beauty, img_idx: 1 },
-  { title: "SK-II 페이셜 트리트먼트 에센스 230ml (피테라)", category: "뷰티", shop_name: "롯데온",
-    price: 159_000, shipping_fee: 0, source: "ARCALIVE", is_lowest: false, img_key: :beauty, img_idx: 2 },
-
-  # ── 스포츠 ──
-  { title: "나이키 프리런 5.0 남성 러닝화 (블랙/볼트)", category: "스포츠", shop_name: "나이키코리아",
-    price: 89_000, shipping_fee: 0, source: "RULIWEB", is_lowest: false, img_key: :sports, img_idx: 0 },
-  { title: "룰루레몬 얼라인 레깅스 25인치 (블랙)", category: "스포츠", shop_name: "룰루레몬",
-    price: 128_000, shipping_fee: 0, source: "AMISAE", is_lowest: true, img_key: :sports, img_idx: 1 },
-  { title: "가민 포러너 265 GPS 스마트워치", category: "스포츠", shop_name: "쿠팡",
-    price: 449_000, shipping_fee: 0, source: "CLIEN", is_lowest: false, img_key: :sports, img_idx: 2 },
-
-  # ── 키즈 ──
-  { title: "레고 테크닉 부가티 시론 42083 (3,599피스)", category: "키즈", shop_name: "레고코리아",
-    price: 389_000, shipping_fee: 0, source: "RULIWEB", is_lowest: false, img_key: :kids, img_idx: 0 },
-  { title: "뽀로로 코딩 컴퓨터 V2 유아 학습 완구", category: "키즈", shop_name: "토이저러스",
-    price: 49_900, shipping_fee: 3_000, source: "PPOMPPU", is_lowest: true, img_key: :kids, img_idx: 1 },
-
-  # ── 반려동물 ──
-  { title: "로얄캐닌 미니 인도어 어덜트 4kg (소형견)", category: "반려동물", shop_name: "펫프렌즈",
-    price: 35_900, shipping_fee: 0, source: "CLIEN", is_lowest: false, img_key: :pet, img_idx: 0 },
-  { title: "캐츠랑 올라이프 고양이 사료 8kg", category: "반려동물", shop_name: "쿠팡",
-    price: 22_900, shipping_fee: 0, source: "PPOMPPU", is_lowest: true, img_key: :pet, img_idx: 1 },
-
-  # ── 기타 ──
-  { title: "[기타] LG+U 알뜰 매달 3만원 상품권 쌀먹 혜택 (18330/무료)", category: "통신", shop_name: "LG유플러스",
-    price: 18_330, shipping_fee: 0, source: "QUASARZONE", is_lowest: false, img_key: :digital, img_idx: 5 }
+  {
+    title: "LG전자 울트라기어 27GP850 게이밍 모니터 QHD 180Hz",
+    price: 399000,
+    url: "https://www.lge.co.kr",
+    mall_name: "LGE.COM",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "[쿠팡] Apple 아이폰 15 Pro 자급제 256GB 블루 티타늄",
+    price: 1350000,
+    url: "https://www.coupang.com",
+    mall_name: "쿠팡",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "삼성전자 비스포크 제트 봇 AI 로봇청소기 VR50D95936W",
+    price: 890000,
+    url: "https://www.samsung.com",
+    mall_name: "삼성닷컴",
+    category: "가전",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "나이키 덩크 로우 레트로 블랙/화이트 (범고래)",
+    price: 129000,
+    url: "https://www.nike.com",
+    mall_name: "나이키 공홈",
+    category: "의류",
+    shipping_fee: 3000,
+    is_lowest: false
+  },
+  {
+    title: "신라면 120g x 40봉 (1박스) 무료배송",
+    price: 24900,
+    url: "https://brand.naver.com/nongshim",
+    mall_name: "농심몰",
+    category: "식품",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "스탠리 퀜처 H2.0 플로우스테이트 텀블러 1.18L",
+    price: 49000,
+    url: "https://www.stanley1913.com",
+    mall_name: "스탠리",
+    category: "생활용품",
+    shipping_fee: 3000,
+    is_lowest: false
+  },
+  {
+    title: "닌텐도 스위치 OLED 모델 화이트 + 마리오 카트 8",
+    price: 385000,
+    url: "https://www.nintendo.co.kr",
+    mall_name: "닌텐도 스토어",
+    category: "게임",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "다이슨 에어랩 멀티 스타일러 컴플리트 롱",
+    price: 599000,
+    url: "https://www.dyson.co.kr",
+    mall_name: "다이슨",
+    category: "뷰티",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "햇반 210g x 36개 1박스",
+    price: 28900,
+    url: "https://www.cjthemarket.com",
+    mall_name: "CJ더마켓",
+    category: "식품",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "소니 WH-1000XM5 노이즈 캔슬링 헤드폰",
+    price: 398000,
+    url: "https://store.sony.co.kr",
+    mall_name: "소니스토어",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "맥북 프로 14인치 M3 Pro 스페이스 블랙",
+    price: 2690000,
+    url: "https://www.apple.com",
+    mall_name: "Apple",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "갤럭시 S24 울트라 티타늄 그레이 512GB",
+    price: 1540000,
+    url: "https://www.samsung.com",
+    mall_name: "삼성닷컴",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "이케아 MARKUS 마르쿠스 사무용 의자",
+    price: 199000,
+    url: "https://www.ikea.com",
+    mall_name: "IKEA",
+    category: "가구",
+    shipping_fee: 59000,
+    is_lowest: false
+  },
+  {
+    title: "PS5 슬림 디스크 에디션 + 스파이더맨 2 번들",
+    price: 648000,
+    url: "https://www.playstation.com",
+    mall_name: "PS Store",
+    category: "게임",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "코카콜라 제로 355ml x 24캔",
+    price: 16900,
+    url: "https://brand.naver.com/coke",
+    mall_name: "코카콜라 공식몰",
+    category: "식품",
+    shipping_fee: 3000,
+    is_lowest: true
+  },
+  {
+    title: "에어팟 프로 2세대 USB-C",
+    price: 299000,
+    url: "https://www.apple.com",
+    mall_name: "쿠팡",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "LG 그램 16인치 2024년형 울트라 슬림",
+    price: 1450000,
+    url: "https://www.lge.co.kr",
+    mall_name: "LGE.COM",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "스타벅스 카페 아메리카노 T 2잔 + 부드러운 생크림 카스텔라",
+    price: 11500,
+    url: "https://www.kakao.com",
+    mall_name: "카카오톡 선물하기",
+    category: "식품",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "아디다스 삼바 OG 화이트/블랙",
+    price: 139000,
+    url: "https://www.adidas.co.kr",
+    mall_name: "아디다스",
+    category: "의류",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "비비고 왕교자 1.05kg x 2봉",
+    price: 17900,
+    url: "https://www.cjthemarket.com",
+    mall_name: "CJ더마켓",
+    category: "식품",
+    shipping_fee: 3000,
+    is_lowest: true
+  },
+  {
+    title: "삼성 오디세이 G9 OLED 게이밍 모니터",
+    price: 1790000,
+    url: "https://www.samsung.com",
+    mall_name: "삼성닷컴",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "로지텍 MX Master 3S 무선 마우스",
+    price: 119000,
+    url: "https://www.logitech.com",
+    mall_name: "로지텍",
+    category: "디지털",
+    shipping_fee: 2500,
+    is_lowest: false
+  },
+  {
+    title: "하기스 네이처메이드 기저귀 3단계 밴드형",
+    price: 45000,
+    url: "https://www.momq.co.kr",
+    mall_name: "맘큐",
+    category: "키즈",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "설화수 자음 2종 세트",
+    price: 89000,
+    url: "https://www.amorepacific.com",
+    mall_name: "아모레몰",
+    category: "뷰티",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "아이패드 에어 5세대 64GB Wi-Fi",
+    price: 749000,
+    url: "https://www.apple.com",
+    mall_name: "쿠팡",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "나이키 스포츠웨어 클럽 플리스 후디",
+    price: 69000,
+    url: "https://www.nike.com",
+    mall_name: "나이키",
+    category: "의류",
+    shipping_fee: 3000,
+    is_lowest: false
+  },
+  {
+    title: "테팔 매직핸즈 인덕션 프라이팬 세트",
+    price: 89900,
+    url: "https://brand.naver.com/tefal",
+    mall_name: "테팔",
+    category: "생활용품",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "일리 Y3.3 캡슐커피머신 + 캡슐 14개",
+    price: 119000,
+    url: "https://shop.illy.com",
+    mall_name: "일리",
+    category: "가전",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "구글 기프트카드 5만원권 (코드발송)",
+    price: 46500,
+    url: "https://www.tmon.co.kr",
+    mall_name: "티몬",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "SKT 5GX 요금제 가입 이벤트",
+    price: 0,
+    url: "https://www.tworld.co.kr",
+    mall_name: "T월드",
+    category: "통신",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "로컬스티치 멤버십 1개월 이용권",
+    price: 99000,
+    url: "https://localstitch.co.kr",
+    mall_name: "로컬스티치",
+    category: "생활용품",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "요넥스 배드민턴 라켓 나노플레어 700",
+    price: 189000,
+    url: "https://www.yonex.co.kr",
+    mall_name: "요넥스",
+    category: "스포츠",
+    shipping_fee: 3000,
+    is_lowest: false
+  },
+  {
+    title: "로얄캐닌 인도어 어덜트 고양이 사료 10kg",
+    price: 89000,
+    url: "https://www.royalcanin.com",
+    mall_name: "펫프렌즈",
+    category: "반려동물",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "발뮤다 더 토스터 K05B",
+    price: 249000,
+    url: "https://www.balmuda.co.kr",
+    mall_name: "발뮤다",
+    category: "가전",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "시디즈 T50 AIR 매쉬 의자",
+    price: 349000,
+    url: "https://www.sidiz.com",
+    mall_name: "시디즈",
+    category: "가구",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "LG 스탠바이미 27인치 이동식 TV",
+    price: 980000,
+    url: "https://www.lge.co.kr",
+    mall_name: "LGE.COM",
+    category: "가전",
+    shipping_fee: 0,
+    is_lowest: false
+  },
+  {
+    title: "애플워치 SE 2세대 40mm GPS",
+    price: 299000,
+    url: "https://www.apple.com",
+    mall_name: "쿠팡",
+    category: "디지털",
+    shipping_fee: 0,
+    is_lowest: true
+  },
+  {
+    title: "스팸 클래식 340g x 10개",
+    price: 32900,
+    url: "https://www.cjthemarket.com",
+    mall_name: "CJ더마켓",
+    category: "식품",
+    shipping_fee: 3000,
+    is_lowest: true
+  }
 ]
 
-# ── 시간 분포 (자연스럽게) ──
-time_offsets = deals_data.each_with_index.map { |_, i| (i * 3 + rand(0..5)).minutes }
+sources = [ "PPOMPPU", "RULIWEB", "QUASARZONE", "AMISAE", "CLIEN", "ARCALIVE" ]
 
 deals_data.each_with_index do |data, idx|
-  img = IMAGES[data[:img_key]][data[:img_idx]] rescue IMAGES[:digital].first
-
   deal = Deal.create!(
-    title:         data[:title],
-    url:           "https://example.com/deal/#{idx + 1}",
-    source:        data[:source],
-    category:      data[:category],
-    shop_name:     data[:shop_name],
-    price:         data[:price],
-    shipping_fee:  data[:shipping_fee],
-    is_lowest:     data[:is_lowest],
-    thumbnail_url: img,
-    description:   "#{data[:title]} — #{data[:shop_name]}에서 최저가로 만나보세요.",
-    posted_at:     time_offsets[idx].ago,
+    title: data[:title],
+    price: data[:price],
+    url: "#{data[:url]}?v=#{idx}",
+    shop_name: data[:mall_name],
+    category: data[:category],
+    shipping_fee: data[:shipping_fee],
+    source: sources.sample,
+    posted_at: (idx * 30).minutes.ago,
+    thumbnail_url: "https://picsum.photos/seed/#{idx}/200/200",
+    is_lowest: data[:is_lowest],
+    description: "#{data[:title]} 상세 설명입니다.\n\n가격: #{data[:price]}원\n몰: #{data[:mall_name]}\n\n지금 바로 확인해보세요!"
   )
 
-  # 가격 히스토리 (30% 확률로 이전 가격 기록 생성)
+  # 가격 변동 히스토리 생성 (약 30% 확률)
   if rand < 0.3
-    higher = (data[:price] * rand(1.15..1.45)).round(-2)  # 15~45% 더 비쌌던 가격
-    deal.price_histories.create!(recorded_price: higher, created_at: 7.days.ago)
-    deal.price_histories.create!(recorded_price: (higher * rand(0.95..1.05)).round(-2), created_at: 3.days.ago)
-    deal.price_histories.create!(recorded_price: data[:price], created_at: Time.current)
+    base_price = data[:price]
+    3.times do |i|
+      PriceHistory.create!(
+        deal: deal,
+        recorded_price: base_price * (1.0 + (i + 1) * 0.1), # 과거에는 더 비쌌음
+        created_at: (i + 1).days.ago
+      )
+    end
   end
 end
 
 puts "✅ #{Deal.count}개 핫딜 생성 완료!"
 puts "   📊 카테고리: #{Deal.distinct.pluck(:category).join(', ')}"
-puts "   🏪 쇼핑몰: #{Deal.distinct.pluck(:shop_name).compact.count}개"
+puts "   🏪 쇼핑몰: #{Deal.distinct.pluck(:shop_name).count}개"
 puts "   🐝 허니픽(최저가): #{Deal.where(is_lowest: true).count}개"
+puts ""
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🎁 이벤트 데이터
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 이벤트 데이터
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-puts "\n🎁 이벤트 데이터 생성 중..."
-
-EVENT_IMAGES = [
-  "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800&h=600&fit=crop", # 선물박스
-  "https://images.unsplash.com/photo-1464983308776-8f2b0b6a4f9f?w=800&h=600&fit=crop", # 파티
-  "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop", # 쇼핑백
-  "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=800&h=600&fit=crop", # 선물
-  "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&h=600&fit=crop", # 이벤트
-  "https://images.unsplash.com/photo-1511268559489-34b624fbfcf5?w=800&h=600&fit=crop", # 축하
-  "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop", # 가전
-  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop" # 헤드폰
-].freeze
+puts "🎁 이벤트 데이터 생성 중..."
 
 events_data = [
   {
     title: "🎉 SK텔레콤 5G 가입 이벤트 - 갤럭시 버즈3 프로 증정",
     organizer: "SK telecom",
     platform_type: "통신사",
-    start_date: Date.today - 1.day,
+    url: "https://www.sktelecom.com",
+    thumbnail_url: "https://picsum.photos/seed/event1/800/400",
+    description: "T월드에서 5G 요금제 신규 가입하고 갤럭시 버즈3 프로 받아가세요!\n\n참여 방법:\n1. T월드 로그인\n2. 이벤트 응모 버튼 클릭\n3. 5G 요금제 가입",
+    start_date: Date.today - 2.days,
     end_date: Date.today + 7.days,
     entry_type: "작문/댓글",
-    announcement_date: Date.today + 14.days,
     winner_count: 90,
-    prize_tags: [ "네이버페이", "네이버페이 5천원" ].to_json,
-    description: "🎊 댓글 EVENT 🎊\n\n모두의 손해 🤝\nT 멤버십 혜택을 한 곳에 꽉 담았다고 🔥\n\n'혜택을.. 노래로 만든다고? 🎵' 를 시청하고,\n내가 자주 이용하는 T 멤버십 혜택 중 노래 가사로 담기면 하는 브랜드를 댓글로 남겨주세요!\n\n추첨을 통해 선물을 드립니다! 😍\n\n📍 이벤트 참여 방법\n✔️ SK텔레콤 유튜브 채널 구독하기\n✔️ 본 영상 좋아요 누르기\n✔️ [혜택을.. 노래로 만든다고?🎵] 시청 후,\n'노래 가사로 담기면 하는 브랜드' 댓글 남기기\n\n📍 이벤트 기간\n2/13(금) ~ 2/20(금)\n\n📍 경품\n(90명) 네이버페이 5천원",
-    url: "https://example.com/event/sk-telecom",
-    thumbnail_url: EVENT_IMAGES[0],
-    is_manual: false,
-    share_count: 42,
-    bookmark_count: 128
+    announcement_date: Date.today + 14.days,
+    prize_tags: [ "네이버페이", "네이버페이 5천원" ],
+    share_count: 5,
+    bookmark_count: 12
   },
   {
-    title: "🎁 LG전자 설 맞이 가전 구매 이벤트",
-    organizer: "LG전자",
-    platform_type: "가전",
-    start_date: Date.today - 5.days,
-    end_date: Date.today + 10.days,
+    title: "🌸 올리브영 봄맞이 빅세일 & 럭키박스 증정",
+    organizer: "Alive Young",
+    platform_type: "뷰티",
+    url: "https://www.oliveyoung.co.kr",
+    thumbnail_url: "https://picsum.photos/seed/event2/800/400",
+    description: "올영이 준비한 역대급 봄 세일!\n매일 선착순 1,000명에게 럭키박스를 드립니다.",
+    start_date: Date.today,
+    end_date: Date.today + 3.days,
     entry_type: "선착순",
-    announcement_date: Date.today + 12.days,
-    winner_count: 500,
-    prize_tags: [ "LG 스타일러", "LG 건조기", "네이버페이 10만원" ].to_json,
-    description: "LG전자 설 맞이 대축제! 🎊\n\n가전제품 구매 시 푸짐한 경품을 드립니다.\n\n✨ 1등: LG 스타일러 (5명)\n✨ 2등: LG 건조기 (10명)\n✨ 3등: 네이버페이 10만원 (485명)\n\n※ 참여방법\n1. LG전자 공식몰 회원가입\n2. 이벤트 기간 내 50만원 이상 구매\n3. 자동 응모 완료",
-    url: "https://example.com/event/lg-electronics",
-    thumbnail_url: EVENT_IMAGES[6],
-    is_manual: false,
-    share_count: 215,
-    bookmark_count: 567
+    winner_count: 3000,
+    announcement_date: Date.today + 4.days,
+    prize_tags: [ "상품권", "미용소품" ],
+    share_count: 120,
+    bookmark_count: 340
   },
   {
-    title: "🎮 플레이스테이션 스토어 설 특가 이벤트",
+    title: "🎮 플레이스테이션 5 프로 출시 기념 기대평 이벤트",
     organizer: "Sony PlayStation",
     platform_type: "게임",
-    start_date: Date.today - 3.days,
-    end_date: Date.today + 4.days,
-    entry_type: "구매",
-    announcement_date: Date.today + 8.days,
-    winner_count: 100,
-    prize_tags: [ "PS5 디지털 에디션", "듀얼센스 컨트롤러", "PSN 기프트카드" ].to_json,
-    description: "PlayStation 설 특가 세일! 🎮\n\n최대 80% 할인된 가격으로 인기 게임을 만나보세요.\n\n🎁 이벤트 경품\n- 1등: PS5 디지털 에디션 (10명)\n- 2등: 듀얼센스 컨트롤러 (30명)\n- 3등: PSN 기프트카드 5만원 (60명)\n\n응모 방법: 이벤트 기간 중 게임 1개 이상 구매",
-    url: "https://example.com/event/playstation",
-    thumbnail_url: EVENT_IMAGES[1],
-    is_manual: false,
-    share_count: 892,
-    bookmark_count: 1453
+    url: "https://www.playstation.com",
+    thumbnail_url: "https://picsum.photos/seed/event3/800/400",
+    description: "PS5 Pro 출시 기념!\n기대평을 남겨주시면 추첨을 통해 PS5 Pro를 드립니다.",
+    start_date: Date.today - 5.days,
+    end_date: Date.today + 10.days,
+    entry_type: "작문/댓글",
+    winner_count: 1,
+    announcement_date: Date.today + 20.days,
+    prize_tags: [ "PS5 Pro", "듀얼센스" ],
+    share_count: 450,
+    bookmark_count: 890
   },
   {
-    title: "☕ 스타벅스 봄맞이 e-프리퀀시 2배 적립",
+    title: "🍱 CJ더마켓 햇반 정기배송 신청 시 첫 달 100원",
+    organizer: "CJ CheilJedang",
+    platform_type: "식품",
+    url: "https://www.cjthemarket.com",
+    thumbnail_url: "https://picsum.photos/seed/event4/800/400",
+    description: "밥 하지 마세요!\n햇반 정기배송 신청하면 첫 달 100원에 드립니다.",
+    start_date: Date.today - 10.days,
+    end_date: Date.today - 1.days, # 마감된 이벤트
+    entry_type: "구매",
+    winner_count: 0,
+    announcement_date: nil,
+    prize_tags: [ "할인쿠폰" ],
+    share_count: 30,
+    bookmark_count: 45
+  },
+  {
+    title: "💻 LG 그램 대학생 서포터즈 모집",
+    organizer: "LG전자",
+    platform_type: "가전",
+    url: "https://www.lge.co.kr",
+    thumbnail_url: "https://picsum.photos/seed/event5/800/400",
+    description: "LG 그램과 함께할 대학생 서포터즈를 모집합니다.\n활동비 지급 및 최우수 활동자 그램 증정!",
+    start_date: Date.today - 1.days,
+    end_date: Date.today + 14.days,
+    entry_type: "가입",
+    winner_count: 20,
+    announcement_date: Date.today + 20.days,
+    prize_tags: [ "노트북", "활동비" ],
+    share_count: 80,
+    bookmark_count: 150
+  },
+  {
+    title: "☕ 스타벅스 사이렌 오더 1억건 돌파 기념 별 증정",
     organizer: "Starbucks Korea",
     platform_type: "식품",
-    start_date: Date.today,
-    end_date: Date.today + 14.days,
-    entry_type: "자동참여",
-    announcement_date: Date.today + 15.days,
-    winner_count: 1000,
-    prize_tags: [ "아메리카노 쿠폰", "텀블러", "스타벅스 카드" ].to_json,
-    description: "🌸 봄맞이 e-프리퀀시 2배 적립 이벤트!\n\n기간 내 음료 구매 시 별 2개 적립\n\n🎁 추첨 경품\n- 1등: 스타벅스 카드 10만원 (100명)\n- 2등: 스타벅스 텀블러 (300명)\n- 3등: 아메리카노 쿠폰 (600명)\n\n※ 스타벅스 리워드 회원 자동 참여",
-    url: "https://example.com/event/starbucks",
-    thumbnail_url: EVENT_IMAGES[2],
-    is_manual: false,
-    share_count: 1247,
-    bookmark_count: 2891
-  },
-  {
-    title: "👟 나이키 멤버십 신규 가입 이벤트",
-    organizer: "Nike Korea",
-    platform_type: "의류",
-    start_date: Date.today - 2.days,
-    end_date: Date.today + 20.days,
-    entry_type: "가입",
-    announcement_date: Date.today + 25.days,
-    winner_count: 200,
-    prize_tags: [ "나이키 에어맥스", "나이키 기프트카드", "운동복 세트" ].to_json,
-    description: "🏃 나이키 멤버십 신규 가입 이벤트\n\n지금 가입하고 푸짐한 혜택을 받아가세요!\n\n🎁 경품\n- 1등: 나이키 에어맥스 (20명)\n- 2등: 나이키 기프트카드 10만원 (80명)\n- 3등: 운동복 세트 (100명)\n\n+ 신규 가입 즉시 15% 할인 쿠폰 증정",
-    url: "https://example.com/event/nike",
-    thumbnail_url: EVENT_IMAGES[3],
-    is_manual: false,
-    share_count: 534,
-    bookmark_count: 1092
-  },
-  {
-    title: "🎧 애플 에어팟 프로 2세대 체험단 모집",
-    organizer: "Apple Korea",
-    platform_type: "디지털",
-    start_date: Date.today - 1.day,
-    end_date: Date.today + 5.days,
-    entry_type: "작문/댓글",
-    announcement_date: Date.today + 7.days,
-    winner_count: 50,
-    prize_tags: [ "에어팟 프로 2세대", "애플 기프트카드" ].to_json,
-    description: "🎧 에어팟 프로 2세대 체험단 모집!\n\n새로워진 H2 칩과 적응형 오디오를 직접 경험해보세요.\n\n📝 참여 방법\n1. 애플 코리아 인스타그램 팔로우\n2. 게시물 좋아요 + 댓글 남기기\n3. 스토리 공유하기\n\n🎁 선정 혜택\n- 에어팟 프로 2세대 (50명, 체험 후 증정)\n- 리뷰 작성 시 애플 기프트카드 5만원 추가 증정",
-    url: "https://example.com/event/apple-airpods",
-    thumbnail_url: EVENT_IMAGES[7],
-    is_manual: false,
-    share_count: 1823,
-    bookmark_count: 3421
-  },
-  {
-    title: "🏠 이케아 봄맞이 인테리어 이벤트",
-    organizer: "IKEA Korea",
-    platform_type: "가구",
-    start_date: Date.today - 7.days,
-    end_date: Date.today + 23.days,
-    entry_type: "구매",
-    announcement_date: Date.today + 30.days,
-    winner_count: 300,
-    prize_tags: [ "이케아 가구", "이케아 기프트카드", "쿠션/러그 세트" ].to_json,
-    description: "🌸 이케아 봄맞이 인테리어 이벤트\n\n봄을 맞아 집을 새롭게 꾸며보세요!\n\n🎁 경품\n- 1등: 이케아 가구 세트 100만원 상당 (10명)\n- 2등: 이케아 기프트카드 30만원 (90명)\n- 3등: 쿠션/러그 세트 (200명)\n\n※ 30만원 이상 구매 시 자동 응모",
-    url: "https://example.com/event/ikea",
-    thumbnail_url: EVENT_IMAGES[4],
-    is_manual: false,
-    share_count: 678,
-    bookmark_count: 1234
-  },
-  {
-    title: "💄 올리브영 뷰티 페스티벌 2026",
-    organizer: "Olive Young",
-    platform_type: "뷰티",
+    url: "https://www.starbucks.co.kr",
+    thumbnail_url: "https://picsum.photos/seed/event6/800/400",
+    description: "사이렌 오더 주문 시 별 3개 추가 적립!\n매일매일 참여 가능합니다.",
     start_date: Date.today,
     end_date: Date.today + 30.days,
-    entry_type: "선착순",
-    announcement_date: Date.today + 32.days,
-    winner_count: 2000,
-    prize_tags: [ "뷰티 럭키박스", "올리브영 기프트카드", "인기 화장품 세트" ].to_json,
-    description: "💄 올리브영 뷰티 페스티벌 2026\n\n최대 50% 할인 + 푸짐한 사은품!\n\n🎁 이벤트 경품 (매일 추첨)\n- 뷰티 럭키박스 (1,000명)\n- 올리브영 기프트카드 5만원 (500명)\n- 인기 화장품 세트 (500명)\n\n※ 매일 1만원 이상 구매 시 1회 응모 가능",
-    url: "https://example.com/event/oliveyoung",
-    thumbnail_url: EVENT_IMAGES[5],
-    is_manual: false,
-    share_count: 2341,
-    bookmark_count: 4892
+    entry_type: "구매",
+    winner_count: 0,
+    announcement_date: nil,
+    prize_tags: [ "별", "쿠폰" ],
+    share_count: 200,
+    bookmark_count: 300
+  },
+  {
+    title: "👟 나이키 런 클럽 챌린지 - 100km 달리기",
+    organizer: "Nike Korea",
+    platform_type: "의류",
+    url: "https://www.nike.com",
+    thumbnail_url: "https://picsum.photos/seed/event7/800/400",
+    description: "이번 달 100km 달리기 성공하고\n한정판 러닝화 래플 응모하세요!",
+    start_date: Date.today - 15.days,
+    end_date: Date.today + 15.days,
+    entry_type: "자동참여",
+    winner_count: 50,
+    announcement_date: Date.today + 20.days,
+    prize_tags: [ "러닝화", "티셔츠" ],
+    share_count: 60,
+    bookmark_count: 90
+  },
+  {
+    title: "📱 아이폰 15 옐로우 출시 기념 퀴즈 이벤트",
+    organizer: "Apple Korea",
+    platform_type: "디지털",
+    url: "https://www.apple.com",
+    thumbnail_url: "https://picsum.photos/seed/event8/800/400",
+    description: "새로운 아이폰 색상은 무엇일까요?\n정답을 맞히면 추첨을 통해 아이폰 케이스를 드립니다.",
+    start_date: Date.today,
+    end_date: Date.today + 5.days,
+    entry_type: "작문/댓글",
+    winner_count: 100,
+    announcement_date: Date.today + 10.days,
+    prize_tags: [ "케이스", "그립톡" ],
+    share_count: 150,
+    bookmark_count: 200
   }
-].freeze
+]
 
 events_data.each_with_index do |data, idx|
   Event.create!(
     title: data[:title],
     organizer: data[:organizer],
     platform_type: data[:platform_type],
+    url: "#{data[:url]}?v=#{idx}",
+    thumbnail_url: data[:thumbnail_url],
+    description: data[:description],
     start_date: data[:start_date],
     end_date: data[:end_date],
     entry_type: data[:entry_type],
-    announcement_date: data[:announcement_date],
     winner_count: data[:winner_count],
+    announcement_date: data[:announcement_date],
     prize_tags: data[:prize_tags],
-    description: data[:description],
-    url: data[:url],
-    thumbnail_url: data[:thumbnail_url],
-    is_manual: data[:is_manual],
     share_count: data[:share_count],
     bookmark_count: data[:bookmark_count],
     created_at: (idx * 2).hours.ago
@@ -436,3 +603,115 @@ end
 
 puts "✅ #{Board.count}개 게시판 생성 완료!"
 puts "   📋 게시판: #{Board.pluck(:name).join(', ')}"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 게시글 & 댓글 더미 데이터
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+puts "📝 게시글 & 댓글 데이터 생성 중..."
+
+# 더미 사용자 생성 (게시글 작성용)
+dummy_users = []
+5.times do |i|
+  dummy_users << User.create!(
+    email: "user#{i+1}@example.com",
+    password: "password123",
+    password_confirmation: "password123"
+  )
+end
+
+# 게시판별 게시글 데이터
+posts_data = {
+  "exchange" => [
+    { title: "🎁 에어팟 프로 2세대 나눔합니다", content: "사용하지 않는 에어팟 프로 2세대 나눔합니다.\n선착순 1명, 댓글로 신청해주세요!\n\n조건:\n- 활동 30일 이상\n- 성실한 후기 작성 필수" },
+    { title: "🤝 스타벅스 쿠폰 교환하실 분", content: "아메리카노 쿠폰 5장 있는데 라떼 쿠폰으로 교환하실 분 계신가요?" },
+    { title: "💝 중고나라 계정 빌려주실 분", content: "급하게 물건 팔아야 하는데 계정이 정지되었습니다 ㅠㅠ\n잠깐만 빌려주실 수 있나요?" },
+    { title: "🎮 닌텐도 스위치 게임 교환", content: "젤다의 전설 <-> 마리오 카트 교환하실 분 구합니다" },
+    { title: "📚 IT 개발 서적 나눔", content: "읽지 않는 개발 서적 10권 정도 나눔합니다.\n직거래 가능하신 분만 댓글 주세요!" }
+  ],
+  "market" => [
+    { title: "🖥️ 맥북 프로 M3 중고 판매", content: "맥북 프로 14인치 M3 모델 판매합니다.\n\n구매일: 2024.11\n상태: S급 (거의 새것)\n가격: 220만원 (네고 가능)\n직거래: 강남역\n\n관심 있으신 분 쪽지 주세요!" },
+    { title: "🎧 소니 WH-1000XM5 헤드폰 팝니다", content: "소니 노이즈캔슬링 헤드폰 판매합니다.\n사용 기간 3개월, 박스/구성품 모두 있습니다.\n\n가격: 28만원\n택배비 별도" },
+    { title: "📱 아이폰 15 Pro 자급제 판매", content: "아이폰 15 Pro 256GB 블루티타늄\n개통 후 미사용 (1주일)\n\n가격: 135만원\n직거래 선호 (서울 전지역)" },
+    { title: "⌚ 애플워치 울트라 2 팝니다", content: "애플워치 울트라 2 판매합니다.\n사용감 거의 없고 스크래치 전혀 없습니다.\n\n가격: 85만원 (네고 X)" },
+    { title: "🎮 PS5 디스크 에디션 판매", content: "플스5 디스크 에디션 + 듀얼센스 2개\n게임 5개 포함\n\n가격: 45만원\n직거래: 홍대입구역" }
+  ],
+  "winners" => [
+    { title: "🎉 SK텔레콤 갤럭시 버즈 당첨!", content: "드디어 당첨되었습니다!!\n5G 가입 이벤트 응모했는데 버즈3 프로 당첨 ㅠㅠ\n\n응모 팁:\n- 매일 응모하기\n- SNS 공유 필수\n- 댓글 성실하게 작성" },
+    { title: "🏆 스타벅스 1년 무료 당첨 후기", content: "믿을 수 없지만 스타벅스 1년 무료 이벤트 당첨되었습니다!\n매일 아메리카노 1잔씩 1년간 무료!\n\n진짜 포기하지 않고 매일 응모하면 당첨됩니다 ㅎㅎ" },
+    { title: "💰 올리브영 10만원 상품권 당첨", content: "올리브영 럭키박스 이벤트 당첨!\n10만원 상품권 받았어요 🎁" },
+    { title: "🎁 애플 에어팟 맥스 당첨 인증", content: "애플 스토어 이벤트 당첨!\n에어팟 맥스 받았습니다 ㅠㅠ\n\n사진 첨부합니다!" },
+    { title: "🎊 LG전자 건조기 당첨 후기", content: "LG 트롬 건조기 당첨되었습니다!\n가격이 200만원이 넘는데... 믿기지 않네요\n\n응모 기간: 3개월\n응모 횟수: 매일" }
+  ],
+  "anonymous" => [
+    { title: "💬 요즘 핫딜 너무 안 올라오는 것 같아요", content: "예전엔 매일 좋은 딜이 올라왔는데\n요즘은 별로인 것 같아요 ㅠㅠ\n\n다들 어떻게 생각하시나요?" },
+    { title: "🤔 이벤트 당첨 확률 진짜 있나요?", content: "매일 응모하는데 한 번도 당첨된 적이 없어요...\n혹시 당첨 조작 아닐까요?" },
+    { title: "😤 중고거래 사기 당했어요", content: "중고나라에서 맥북 사려다가 사기 당했습니다.\n입금하고 연락 두절...\n\n여러분 조심하세요 ㅠㅠ" },
+    { title: "🎮 닌텐도 스위치 vs PS5 뭐가 나을까요?", content: "둘 다 사고 싶은데 예산이 부족해서...\n게임 좋아하시는 분들 추천 부탁드려요!" },
+    { title: "💸 이번 달 핫딜로 얼마나 절약하셨나요?", content: "저는 약 30만원 정도 절약한 것 같아요!\n다들 자랑해주세요 ㅎㅎ" }
+  ],
+  "minigame" => [
+    { title: "🎯 출석체크 이벤트 시작!", content: "매일 출석하면 포인트 적립!\n\n- 1일차: 10P\n- 7일차: 100P\n- 30일차: 1000P\n\n지금 바로 참여하세요!" },
+    { title: "🎲 룰렛 돌리기 이벤트", content: "하루 3번 무료 룰렛!\n\n경품:\n- 1등: 스타벅스 1만원\n- 2등: 편의점 5천원\n- 3등: 포인트 100P" },
+    { title: "🧩 퀴즈 맞히고 포인트 받기", content: "오늘의 퀴즈:\n\nQ. 티니허니의 마스코트는?\n1) 벌\n2) 곰\n3) 토끼\n\n댓글로 정답을 맞혀주세요!" },
+    { title: "🎰 슬롯머신 이벤트", content: "777 맞히면 1만 포인트!\n\n참여 방법:\n1. 댓글로 '참여' 작성\n2. 자동으로 슬롯 돌아감\n3. 결과 확인!" },
+    { title: "🏃 포인트 레이스 시작", content: "이번 주 포인트 1위:\n상금 10만원!\n\n현재 순위:\n1위: user123 (5,230P)\n2위: honey_bee (4,890P)\n3위: deal_hunter (4,120P)" }
+  ]
+}
+
+# 게시글 생성
+all_posts = []
+Board.all.each do |board|
+  posts = posts_data[board.slug] || []
+  posts.each_with_index do |post_data, idx|
+    post = Post.create!(
+      board: board,
+      user: dummy_users.sample,
+      title: post_data[:title],
+      content: post_data[:content],
+      created_at: (posts.length - idx).hours.ago
+    )
+    all_posts << post
+  end
+end
+
+puts "✅ #{Post.count}개 게시글 생성 완료!"
+
+# 댓글 생성
+puts "💬 댓글 데이터 생성 중..."
+
+comment_templates = [
+  "좋은 정보 감사합니다!",
+  "저도 관심 있어요!",
+  "혹시 아직 남아있나요?",
+  "쪽지 보냈습니다!",
+  "가격 네고 가능한가요?",
+  "직거래 가능할까요?",
+  "정보 감사합니다 ㅎㅎ",
+  "저도 신청합니다!",
+  "대박이네요 축하드려요!",
+  "부럽습니다 ㅠㅠ",
+  "저도 당첨되고 싶어요",
+  "팁 감사합니다!",
+  "유용한 정보네요",
+  "공감합니다",
+  "저도 같은 생각이에요"
+]
+
+all_posts.each do |post|
+  # 각 게시글에 0~5개의 랜덤 댓글
+  rand(0..5).times do
+    Comment.create!(
+      post: post,
+      user: dummy_users.sample,
+      content: comment_templates.sample,
+      created_at: rand(1..24).hours.ago
+    )
+  end
+end
+
+puts "✅ #{Comment.count}개 댓글 생성 완료!"
+puts "   📊 게시판별 게시글 수:"
+Board.all.each do |board|
+  puts "      #{board.name}: #{board.posts.count}개"
+end

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TGMOA Admin</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+    
+    <style>
+      :root {
+        --admin-sidebar-width: 260px;
+        --admin-header-height: 64px;
+        --admin-bg: #f8fafc;
+        --admin-primary: #f59e0b; /* Amber 500 */
+      }
+      body {
+        background-color: var(--admin-bg);
+      }
+      .admin-layout {
+        display: flex;
+        min-height: 100vh;
+      }
+      .admin-sidebar {
+        width: var(--admin-sidebar-width);
+        background-color: #1e293b; /* Slate 800 */
+        color: white;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+        z-index: 50;
+      }
+      .admin-main {
+        flex: 1;
+        margin-left: var(--admin-sidebar-width);
+        display: flex;
+        flex-direction: column;
+      }
+      .admin-header {
+        height: var(--admin-header-height);
+        background-color: white;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 40;
+      }
+      .admin-content {
+        padding: 2rem;
+        flex: 1;
+      }
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        color: #94a3b8; /* Slate 400 */
+        text-decoration: none;
+        transition: all 0.2s;
+        font-weight: 500;
+      }
+      .sidebar-link:hover, .sidebar-link.active {
+        background-color: #0f172a; /* Slate 900 */
+        color: white;
+        border-right: 3px solid var(--admin-primary);
+      }
+      .sidebar-brand {
+        height: var(--admin-header-height);
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: white;
+        border-bottom: 1px solid #334155;
+        gap: 0.5rem;
+      }
+      .admin-card {
+        background: white;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="admin-layout">
+      <%# SIDEBAR %>
+      <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+          <span style="font-size: 1.5rem;">🐝</span> TGMOA Admin
+        </div>
+        
+        <nav style="padding-top: 1rem;">
+          <div style="padding: 0 1.5rem 0.5rem; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Overview</div>
+          <%= link_to admin_dashboard_path, class: "sidebar-link #{'active' if controller_name == 'dashboard'}" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            대시보드
+          <% end %>
+
+          <div style="padding: 1.5rem 1.5rem 0.5rem; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Management</div>
+          
+          <%= link_to admin_deals_path, class: "sidebar-link #{'active' if controller_name == 'deals'}" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            핫딜 관리
+          <% end %>
+
+          <%= link_to admin_events_path, class: "sidebar-link #{'active' if controller_name == 'events'}" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            이벤트 관리
+          <% end %>
+
+          <%= link_to admin_users_path, class: "sidebar-link #{'active' if controller_name == 'users'}" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            회원 관리
+          <% end %>
+
+          <div style="padding: 1.5rem 1.5rem 0.5rem; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Community</div>
+
+          <%= link_to admin_boards_path, class: "sidebar-link #{'active' if controller_name == 'boards'}" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            게시판 설정
+          <% end %>
+
+          <%= link_to admin_posts_path, class: "sidebar-link #{'active' if controller_name == 'posts'}" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            게시글 관리
+          <% end %>
+        </nav>
+      </aside>
+
+      <%# MAIN CONTENT %>
+      <main class="admin-main">
+        <header class="admin-header">
+          <h1 class="text-xl font-bold text-slate-800"><%= content_for(:title) || "Dashboard" %></h1>
+          
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #64748b;">
+              <span class="text-sm font-medium"><%= current_user.email %></span>
+              <span class="badge badge-amber text-xs">Admin</span>
+            </div>
+            <%= button_to "로그아웃", destroy_user_session_path, method: :delete, class: "text-sm text-slate-500 hover:text-rose-600 font-medium", style: "background: none; border: none; cursor: pointer;" %>
+            <%= link_to "사이트 홈", root_path, class: "text-sm text-slate-500 hover:text-amber-500 font-medium", target: "_blank" %>
+          </div>
+        </header>
+
+        <div class="admin-content">
+          <% if notice %>
+            <div class="mb-4 p-4 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <%= notice %>
+            </div>
+          <% end %>
+          <% if alert %>
+            <div class="mb-4 p-4 rounded-lg bg-rose-50 text-rose-700 border border-rose-200">
+              <%= alert %>
+            </div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
