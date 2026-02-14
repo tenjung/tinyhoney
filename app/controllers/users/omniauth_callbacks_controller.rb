@@ -3,10 +3,6 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     handle_auth "Google"
   end
 
-  def kakao
-    handle_auth "Kakao"
-  end
-
   def naver
     handle_auth "Naver"
   end

@@ -1,0 +1,19 @@
+<%# ── Shared Component: Category Pills ── %>
+<%# 사용법: render 'shared/category_pills', 
+    action_path:, 
+    categories: [[label, value]], 
+    param_name: :platform_type %>
+
+<section class="pill-row">
+  <% base_path = local_assigns.fetch(:action_path) %>
+  <% extra = local_assigns.fetch(:extra_params, {}) %>
+  <% categories.each do |label, value| %>
+    <% active = (params[param_name].blank? && value.nil?) || params[param_name] == value %>
+    <% query = extra.merge(param_name => value).reject { |_, v| v.blank? } %>
+    <% href = query.any? ? "#{base_path}?#{query.to_query}" : base_path %>
+    <%= link_to href,
+        class: "pill #{active ? 'pill-active' : ''}" do %>
+      <%= label %>
+    <% end %>
+  <% end %>
+</section>

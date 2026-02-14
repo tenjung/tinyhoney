@@ -1,0 +1,20 @@
+<%# ── Shared Component: Header Stats Card ── %>
+<%# 사용법: render 'shared/header_stats', title:, subtitle:, stats: [{label:, value:, color:}] %>
+
+<section class="card-static dash-header">
+  <div>
+    <p class="dash-header-title"><%= local_assigns[:title_small] || "TinyHoney" %></p>
+    <h1><%= title %></h1>
+    <p class="sub"><%= subtitle %></p>
+  </div>
+  <div class="stats-row">
+    <% stats.each do |stat| %>
+      <div class="stat-box">
+        <p class="stat-label"><%= stat[:label] %></p>
+        <p class="stat-value" <%= "style=color:#{stat[:color]}" if stat[:color].present? %>>
+          <%= stat[:value] %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</section>

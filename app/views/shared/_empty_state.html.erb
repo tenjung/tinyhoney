@@ -1,0 +1,15 @@
+<%# ── Shared Component: Empty State ── %>
+<%# 사용법: render 'shared/empty_state', icon:, title:, message:, buttons: [{label:, path:, style:}] %>
+
+<section class="card-static empty-state">
+  <div class="icon"><%= icon %></div>
+  <h3><%= title %></h3>
+  <p><%= message %></p>
+  <% if local_assigns[:buttons].present? %>
+    <div class="actions">
+      <% buttons.each do |btn| %>
+        <%= link_to btn[:label], btn[:path], class: "btn #{btn[:primary] ? 'btn-primary' : 'btn-outline'}", style: btn[:style] %>
+      <% end %>
+    </div>
+  <% end %>
+</section>

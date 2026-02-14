@@ -1,62 +1,72 @@
-<div class="container mx-auto px-4 py-12">
-  <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-    <div>
-      <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">진행 중인 이벤트</h1>
-      <p class="text-slate-500 font-medium">핫딜만큼 강력한 각종 이벤트 정보를 모아보세요.</p>
-    </div>
-    <div class="flex items-center gap-3">
-      <%= link_to "전체", events_path, class: "px-5 py-2.5 #{params[:platform_type].blank? ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200'} text-sm font-bold rounded-full transition-all" %>
-      <%= link_to "웹 전용", events_path(platform_type: "web"), class: "px-5 py-2.5 #{params[:platform_type] == 'web' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200'} text-sm font-bold rounded-full transition-all" %>
-      <%= link_to "앱 전용", events_path(platform_type: "app"), class: "px-5 py-2.5 #{params[:platform_type] == 'app' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200'} text-sm font-bold rounded-full transition-all" %>
-      <div class="w-px h-8 bg-slate-200 mx-2"></div>
-      <%= link_to "이벤트 등록하기", new_event_path, class: "px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black rounded-2xl transition-all shadow-lg shadow-yellow-400/20 active:scale-95" %>
-    </div>
-  </div>
+<%# ── Events / 진행 중 이벤트 (컴포넌트 사용 + 탭) ── %>
 
-  <% if @events.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <% @events.each do |event| %>
-        <div class="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-          <div class="aspect-video bg-slate-50 relative overflow-hidden">
-            <% if event.thumbnail_url.present? %>
-              <%= image_tag event.thumbnail_url, class: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" %>
-            <% else %>
-              <div class="w-full h-full flex items-center justify-center text-5xl">🎁</div>
-            <% end %>
-            <div class="absolute top-4 left-4">
-              <span class="px-3 py-1 bg-white/90 backdrop-blur shadow-sm rounded-full text-[10px] font-black uppercase tracking-widest text-slate-900">
-                <%= event.platform_type %>
-              </span>
-            </div>
-          </div>
-          <div class="p-8">
-            <h3 class="text-xl font-black text-slate-900 mb-4 line-clamp-2 min-h-[3.5rem] group-hover:text-yellow-600 transition-colors">
-              <%= link_to event.title, event.url, target: "_blank" %>
-            </h3>
-            <p class="text-slate-500 text-sm font-medium mb-6 line-clamp-2">
-              <%= event.description.presence || "상세 정보가 없습니다." %>
-            </p>
-            <div class="flex items-center justify-between pt-6 border-t border-slate-50">
-              <span class="text-xs font-bold text-slate-400">
-                <%= event.created_at.strftime("%Y.%m.%d") %> 등록
-              </span>
-              <%= link_to event.url, target: "_blank", class: "flex items-center gap-2 text-sm font-black text-slate-900 hover:text-yellow-600 transition-colors" do %>
-                이벤트 확인
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              <% end %>
-            </div>
-          </div>
-        </div>
+<div class="dash-wrap">
+
+  <%# Header Stats %>
+  <%= render 'shared/header_stats',
+      title_small: 'TinyHoney Event Board',
+      title: @current_tab == 'ongoing' ? '진행 중 이벤트' : '마감된 이벤트',
+      subtitle: '핫딜만큼 강력한 각종 이벤트 정보를 모아보세요',
+      stats: [
+        { label: '전체', value: @total_count },
+        { label: '결과', value: @filtered_count },
+        { label: '진행중', value: @ongoing_count, color: 'var(--color-emerald-600)' },
+        { label: '마감임박', value: @ending_soon_count, color: 'var(--color-rose-600)' }
+      ] %>
+
+  <%# ━━ 탭 ━━ %>
+  <section class="card-static" style="padding: 1rem 1.5rem;">
+    <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--color-slate-100);">
+      <%= link_to events_path(tab: 'ongoing', q: params[:q], platform_type: params[:platform_type], entry_type: params[:entry_type], sort: params[:sort]),
+          class: "pill #{@current_tab == 'ongoing' ? 'pill-active' : ''}",
+          style: "border-radius: 0.5rem 0.5rem 0 0; border-bottom: none; #{@current_tab == 'ongoing' ? 'border-bottom: 3px solid var(--color-amber-500);' : ''}" do %>
+        진행중 <%= @ongoing_count %>
+      <% end %>
+      <%= link_to events_path(tab: 'closed', q: params[:q], platform_type: params[:platform_type], entry_type: params[:entry_type], sort: params[:sort]),
+          class: "pill #{@current_tab == 'closed' ? 'pill-active' : ''}",
+          style: "border-radius: 0.5rem 0.5rem 0 0; border-bottom: none; #{@current_tab == 'closed' ? 'border-bottom: 3px solid var(--color-amber-500);' : ''}" do %>
+        마감 <%= @closed_count %>
       <% end %>
     </div>
+  </section>
+
+  <%# Search Bar %>
+  <%= render 'shared/search_bar',
+      action_path: events_path,
+      placeholder: '이벤트명, 주최사로 검색',
+      filters: [
+        { type: :select, name: :platform_type, options: [["전체 카테고리", nil], ["통신사", "telecom"], ["가전", "appliance"], ["게임", "game"], ["식품", "food"], ["의류", "fashion"], ["디지털", "digital"], ["가구", "furniture"], ["뷰티", "beauty"]] },
+        { type: :select, name: :entry_type, options: [["전체 응모형태", nil], ["작문/댓글", "작문/댓글"], ["선착순", "선착순"], ["구매", "구매"], ["가입", "가입"], ["자동참여", "자동참여"]] },
+        { type: :select, name: :sort, options: [["최신순", nil], ["당첨자 많은순", "winner_desc"], ["마감 임박순", "ending_soon"]] },
+        (@current_tab == 'ongoing' ? { type: :select, name: :status, options: [["전체 상태", nil], ["마감임박만", "ending_soon"]] } : nil)
+      ].compact,
+      buttons: [
+        { label: '이벤트 등록', path: new_event_path, style: 'background: var(--color-amber-500); border-color: var(--color-amber-500);' }
+      ] %>
+
+  <%# Category Pills %>
+  <%= render 'shared/category_pills',
+      action_path: events_path,
+      param_name: :platform_type,
+      categories: [["전체", nil], ["통신사", "telecom"], ["가전", "appliance"], ["게임", "game"], ["식품", "food"], ["의류", "fashion"], ["디지털", "digital"], ["가구", "furniture"], ["뷰티", "beauty"]],
+      extra_params: { tab: @current_tab, q: params[:q], entry_type: params[:entry_type], sort: params[:sort], status: params[:status] } %>
+
+  <%# Event List %>
+  <% if @events.any? %>
+    <section style="display:flex;flex-direction:column;gap:0.5rem">
+      <% @events.each do |event| %>
+        <%= render 'shared/list_card', item: event, type: :event, detail_path: event_path(event) %>
+      <% end %>
+    </section>
   <% else %>
-    <div class="bg-white rounded-[40px] p-20 text-center border-2 border-dashed border-slate-200">
-      <div class="text-8xl mb-8">🎈</div>
-      <h3 class="text-2xl font-black text-slate-900 mb-4">등록된 이벤트가 없습니다.</h3>
-      <p class="text-slate-500 mb-8 max-w-sm mx-auto">첫 번째 이벤트를 직접 등록해 보세요!</p>
-      <%= link_to "이벤트 등록하기", new_event_path, class: "px-8 py-4 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black rounded-3xl transition-all shadow-lg shadow-yellow-400/20 active:scale-95 inline-block" %>
-    </div>
+    <%= render 'shared/empty_state',
+        icon: '🎈',
+        title: @current_tab == 'ongoing' ? '진행 중인 이벤트가 없습니다' : '마감된 이벤트가 없습니다',
+        message: '조건을 조정하거나 초기화를 눌러 다시 확인해 보세요.',
+        buttons: [
+          { label: '필터 초기화', path: events_path(tab: @current_tab), primary: false },
+          (@current_tab == 'ongoing' ? { label: '이벤트 등록하기', path: new_event_path, primary: true, style: 'background: var(--color-amber-500); border-color: var(--color-amber-500);' } : nil)
+        ].compact %>
   <% end %>
+
 </div>
