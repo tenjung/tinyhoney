@@ -112,6 +112,46 @@ bin/dev
   - `users` fixture 중복 이메일 수정
 - README를 인수인계 중심으로 재작성
 
+## 9) 배포 가이드 (Kamal)
 
-##모바일 반응형을 항상 생각해서 제작
-ui
+이 프로젝트는 `kamal`을 사용하여 AWS Lightsail(또는 VPS)에 배포됩니다.
+
+### 주요 명령어
+
+- **배포 (빌드 + 배포)**:
+  ```bash
+  bundle exec kamal deploy
+  ```
+- **환경 변수 갱신**:
+  ```bash
+  bundle exec kamal env push
+  ```
+- **로그 확인**:
+  ```bash
+  bundle exec kamal app logs -f
+  ```
+- **Rails Console 접속**:
+  ```bash
+  bundle exec kamal app exec -i 'bin/rails console'
+  ```
+
+### 배포 관련 중요 사항
+- **DB 마이그레이션**: `kamal deploy` 과정에서 마이그레이션이 포함되어 있으나, 충돌 발생 시 수동 조치가 필요할 수 있습니다.
+- **이미지**: Docker Hub (`tenjung/tgmoa`)를 사용합니다.
+
+## 10) 트러블슈팅 히스토리 (Troubleshooting)
+
+### 2026-02-15: SolidQueue 마이그레이션 충돌 해결 및 배포 성공
+- **상황**: `rename_solid_queue_process_kind_to_name` 마이그레이션 파일이 로컬엔 있으나 배포 시 `PG::DuplicateColumn` 오류 발생.
+- **원인**: 이전 배포 컨테이너(구버전) 내에서 `db:migrate`를 실행하려 했으나, DB에는 이미 컬럼이 존재하고 구버전 코드에는 해당 마이그레이션 파일이 있어 충돌.
+- **해결**:
+  1. 로컬에서 충돌 유발 마이그레이션 파일 삭제 & 커밋 (`Fix: Remove redundant SolidQueue rename migrations`).
+  2. `kamal app exec ... db:migrate` 단계 건너뛰고 바로 `bundle exec kamal deploy` 실행.
+  3. 새 이미지(마이그레이션 파일 제거됨)로 배포되어 충돌 없이 완료.
+- **현재 상태**: 배포 성공 (Version `6c3309a`)
+
+## 11) UI/UX 가이드
+
+- **모바일 우선 (Mobile First)**: 모든 UI는 모바일 환경에서의 가독성과 사용성을 최우선으로 고려합니다.
+- **반응형 디자인**: TailwindCSS의 Breakpoint(`md`, `lg` 등)를 활용하여 데스크탑까지 유연하게 확장합니다.
+- **스켈레톤 로딩**: 데이터 로딩 시 빈 화면 대신 스켈레톤 UI를 노출하여 체감 속도를 높입니다.
