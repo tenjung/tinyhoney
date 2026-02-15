@@ -63,8 +63,6 @@ class CreateSolidQueueTables < ActiveRecord::Migration[7.1]
       t.references :job, index: { unique: true }, null: false
       t.text :error
       t.datetime :created_at, null: false
-
-      t.index :job_id, unique: true
     end
 
     create_table :solid_queue_pauses do |t|
