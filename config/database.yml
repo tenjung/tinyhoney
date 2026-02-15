@@ -84,21 +84,12 @@ production:
   primary: &primary_production
     <<: *default
     database: tiny_honey_production
-    username: tiny_honey
-    password: <%= ENV["TINY_HONEY_DATABASE_PASSWORD"] %>
-    url: <%= ENV["DATABASE_URL"] %>
+    username: <%= ENV["DB_USER"] || "tiny_honey" %>
+    password: <%= ENV["DB_PASSWORD"] %>
+    host: tgmoa-db
   cache:
     <<: *primary_production
-    database: tiny_honey_production_cache
-    migrations_paths: db/cache_migrate
-    url: <%= ENV["DATABASE_URL"] %>
   queue:
     <<: *primary_production
-    database: tiny_honey_production_queue
-    migrations_paths: db/queue_migrate
-    url: <%= ENV["DATABASE_URL"] %>
   cable:
     <<: *primary_production
-    database: tiny_honey_production_cable
-    migrations_paths: db/cable_migrate
-    url: <%= ENV["DATABASE_URL"] %>
