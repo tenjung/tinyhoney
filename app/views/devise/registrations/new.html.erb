@@ -1,0 +1,52 @@
+<div class="min-h-[calc(100vh-64px)] flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h2 class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight">
+        꿀단지를 만드세요!
+      </h2>
+      <p class="mt-2 text-sm text-gray-600">
+        티꿀모아와 함께 알뜰한 쇼핑의 즐거움을 시작해보세요.
+      </p>
+    </div>
+
+    <!-- Registration Form -->
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="space-y-4">
+        <div>
+          <%= f.label :email, "이메일 주소", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "example@email.com", class: "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm transition-colors" %>
+        </div>
+
+        <div>
+          <%= f.label :password, "비밀번호", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <% if @minimum_password_length %>
+            <em class="text-xs text-gray-500 block mb-1">(최소 <%= @minimum_password_length %>자 이상)</em>
+          <% end %>
+          <%= f.password_field :password, autocomplete: "new-password", placeholder: "비밀번호 입력", class: "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm transition-colors" %>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, "비밀번호 확인", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "비밀번호 재입력", class: "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm transition-colors" %>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <%= f.submit "회원가입 완료", class: "group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-yellow-500 hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed" %>
+      </div>
+    <% end %>
+
+    <!-- Footer -->
+    <div class="text-center mt-6">
+      <p class="text-sm text-gray-600">
+        이미 계정이 있으신가요?
+        <%- if controller_name != 'sessions' %>
+          <%= link_to "로그인 하러 가기", new_session_path(resource_name), class: "font-medium text-yellow-600 hover:text-yellow-500 ml-1 underline underline-offset-2" %>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</div>
