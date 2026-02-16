@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 // Vercel Cron Job: 핫딜 크롤러
-// vercel.json에 cron 설정: "schedule": "every 10 minutes"
+// vercel.json에 cron 설정: "schedule": "0 0 * * *" (하루 1회, UTC 기준)
 // 환경변수: CRON_SECRET (Vercel Cron 인증)
 
 const supabase = createClient(
