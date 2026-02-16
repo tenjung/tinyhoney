@@ -1,11 +1,29 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+    return (
+        <Suspense fallback={<LoginPageFallback />}>
+            <LoginPageContent />
+        </Suspense>
+    );
+}
+
+function LoginPageFallback() {
+    return (
+        <div className="dash-wrap" style={{ maxWidth: "28rem", paddingTop: "4rem" }}>
+            <section className="card-static" style={{ padding: "2rem", textAlign: "center" }}>
+                <p style={{ fontSize: "0.875rem", color: "var(--color-slate-500)" }}>로그인 페이지를 불러오는 중...</p>
+            </section>
+        </div>
+    );
+}
+
+function LoginPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialEmail = useMemo(() => searchParams.get("email") ?? "", [searchParams]);
