@@ -41,3 +41,6 @@ log/
 storage/
 tmp/
 .ruby-lsp/
+
+_old_rails_kamal/secrets
+_old_rails_kamal/secrets-common
