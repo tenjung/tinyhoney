@@ -4,56 +4,64 @@ import { stripTags, extractNumber, decodeEntities } from "./base";
 /**
  * 어미새 핫딜 크롤러
  *
- * 구조: XpressEngine 기반 (FM코리아와 유사한 가능성)
- * 안티봇: Cloudflare 보호 가능성 있음 — 실패 시 graceful skip
+ * 구조: Rhymix/XE 게시판 table(_listA) 기반
  */
 const amisaeCrawler: CrawlerConfig = {
     name: "어미새",
     source: "AMISAE",
-    url: "https://eomisae.co.kr/hotdeal",
+    url: "https://eomisae.co.kr/os",
     headers: {
         Referer: "https://eomisae.co.kr/",
         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     },
     parseList(html: string): ParsedDeal[] {
         const deals: ParsedDeal[] = [];
+        const seen = new Set<string>();
 
-        // XpressEngine 기반 리스트 (li 또는 div)
-        const itemRegex = /<li[^>]*class="[^"]*li[^"]*"[^>]*>([\s\S]*?)<\/li>/gi;
-        let itemMatch;
+        // 게시글 링크 파싱 (테이블 + 카드 레이아웃 공통)
+        const linkRegex =
+            /<a[^>]*class="[^"]*pjax[^"]*"[^>]*href="(\/os\/\d+|https:\/\/eomisae\.co\.kr\/os\/\d+)"[^>]*>([\s\S]*?)<\/a>/gi;
+        let linkMatch;
 
-        while ((itemMatch = itemRegex.exec(html)) !== null) {
-            const item = itemMatch[1];
-
-            // 제목 + 링크
-            const titleMatch = item.match(
-                /<a[^>]*href="(\/\d+|https:\/\/eomisae\.co\.kr\/\d+)"[^>]*>([\s\S]*?)<\/a>/i
-            );
-            if (!titleMatch) continue;
-
-            const href = titleMatch[1];
-            const title = decodeEntities(stripTags(titleMatch[2])).replace(/\s+/g, " ").trim();
+        while ((linkMatch = linkRegex.exec(html)) !== null) {
+            const href = linkMatch[1];
+            const title = decodeEntities(stripTags(linkMatch[2])).replace(/\s+/g, " ").trim();
             if (!title || title.length < 3) continue;
+            if (/전체 공개로 전환됩니다|Read More/i.test(title)) continue;
 
             const url = href.startsWith("http")
                 ? href
                 : `https://eomisae.co.kr${href}`;
+            if (seen.has(url)) continue;
+            seen.add(url);
 
-            // 가격
-            const priceText = item.match(/([\d,]+)\s*원/);
+            // 링크 주변 컨텍스트에서 카테고리/썸네일 추출
+            const contextStart = Math.max(0, linkMatch.index - 260);
+            const contextEnd = Math.min(html.length, linkMatch.index + 320);
+            const context = html.slice(contextStart, contextEnd);
+
+            // 카테고리 (국내/해외/네이버 등)
+            const categoryMatch = context.match(/<span[^>]*class="[^"]*cate[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
+            const category = categoryMatch ? decodeEntities(stripTags(categoryMatch[1])).trim() : null;
+
+            // 공지/광고 제외
+            if (category === "공지" || category === "AD" || /공지|이용 규정|상품권 이벤트/.test(title)) {
+                continue;
+            }
+
+            // 가격 (제목에서 추출)
+            const priceText = title.match(/([\d,]+)\s*원/);
             const price = priceText ? extractNumber(priceText[1]) : 0;
 
-            // 쇼핑몰
-            const shopMatch = item.match(/class="[^"]*shop[^"]*"[^>]*>([^<]+)</i);
-            const shopName = shopMatch ? stripTags(shopMatch[1]).trim() : null;
+            // 쇼핑몰명: [무신사] 형태 태그가 있을 경우 추출
+            const shopMatch = title.match(/^\[([^\]]+)\]/);
+            const shopName = shopMatch ? shopMatch[1].trim() : null;
 
-            // 카테고리
-            const categoryMatch = item.match(/class="[^"]*cate[^"]*"[^>]*>([^<]+)</i);
-            const category = categoryMatch ? stripTags(categoryMatch[1]).trim() : null;
-
-            // 썸네일
-            const thumbMatch = item.match(/<img[^>]*src="([^"]*)"[^>]*>/i);
-            const thumbnailUrl = thumbMatch ? thumbMatch[1] : null;
+            const thumbMatch = context.match(/<img[^>]*class="[^"]*tmb[^"]*"[^>]*src="([^"]*)"[^>]*>/i);
+            let thumbnailUrl = thumbMatch ? thumbMatch[1] : null;
+            if (thumbnailUrl?.startsWith("//")) {
+                thumbnailUrl = `https:${thumbnailUrl}`;
+            }
 
             deals.push({
                 title,

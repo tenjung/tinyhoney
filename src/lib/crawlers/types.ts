@@ -24,7 +24,7 @@ export interface CrawlerConfig {
     /** Display name (e.g. "FM코리아") */
     name: string;
     /** Source key matching DB CHECK constraint */
-    source: "PPOMPPU" | "RULIWEB" | "QUASARZONE" | "CLIEN" | "FMKOREA" | "AMISAE";
+    source: "PPOMPPU" | "RULIWEB" | "QUASARZONE" | "CLIEN" | "FMKOREA" | "AMISAE" | "ARCALIVE";
     /** Target URL to crawl */
     url: string;
     /** Custom headers for anti-bot bypass */

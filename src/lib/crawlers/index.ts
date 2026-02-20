@@ -9,6 +9,7 @@ import quasarzoneCrawler from "./quasarzone";
 import clienCrawler from "./clien";
 import fmkoreaCrawler from "./fmkorea";
 import amisaeCrawler from "./amisae";
+import arcaliveCrawler from "./arcalive";
 
 import type { CrawlerConfig } from "./types";
 
@@ -20,6 +21,7 @@ export const ALL_CRAWLERS: CrawlerConfig[] = [
     ppomppuCrawler,    // 🟡 EUC-KR + 403 대응
     quasarzoneCrawler, // 🟡 403 대응
     amisaeCrawler,     // 🟡 시도 후 판단
+    arcaliveCrawler,   // 🔴 Cloudflare 차단 가능성 높음
 ];
 
 /** Get a single crawler by source key */
